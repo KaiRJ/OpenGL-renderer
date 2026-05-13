@@ -1,0 +1,9 @@
+Following https://learnopengl.com/
+
+* Getting Starting
+** DONE Creating a window tutorial
+CLOSED: [2026-05-12 Tue 16:45]
+** DONE Move code into a new folder for specific sections
+CLOSED: [2026-05-12 Tue 17:03]
+** Hello Window tutorial
+** Read "Additional resources" sections of Creating a window
