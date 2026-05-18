@@ -7,13 +7,24 @@ CLOSED: [2026-05-12 Tue 16:45]
 CLOSED: [2026-05-12 Tue 17:03]
 ** DONE Hello Window tutorial
 CLOSED: [2026-05-13 Wed 17:52]
-** DONE Read "Additional resources" sections of Creating a window
+** DONE Read "Additional resources" section of Creating a window
 CLOSED: [2026-05-14 Thu 19:58]
-** Hello Triangle tutorial
+** DONE Hello Triangle tutorial
+CLOSED: [2026-05-17 Sun 16:23]
+** DONE Read "Additional resources" section of Hello Triangle tutorial
+CLOSED: [2026-05-17 Sun 16:46]
+** Watch relevant The Cherno videos
+** Anton's Hello Triangle tutorial
+https://antongerdelan.net/opengl/hellotriangle.html
+** Anton's Extended Initialisation tutorial
+https://antongerdelan.net/opengl/glcontext2.html
 ** Read "Getting started" tutorial from GLFW
 https://www.glfw.org/docs/latest/quick_guide.html
-** Read "Intoduction to the API" tutorial from GLFW
+** Read "Introduction to the API" tutorial from GLFW
 - and look at the other guides on this page
+** Read Debugging tutorial
+https://learnopengl.com/In-Practice/Debugging
+** Hello Triangle exercises
 * Project ideas
 ** Moving screen moves view
 - I'd you move the game window it also moves where you are looking in the game
@@ -21,3 +32,4 @@ https://www.glfw.org/docs/latest/quick_guide.html
 - minimizing could do something
 - full screen could do something
 - shaking the screen
+** Simple renderer
