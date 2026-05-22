@@ -13,18 +13,36 @@ CLOSED: [2026-05-14 Thu 19:58]
 CLOSED: [2026-05-17 Sun 16:23]
 ** DONE Read "Additional resources" section of Hello Triangle tutorial
 CLOSED: [2026-05-17 Sun 16:46]
-** Watch relevant The Cherno videos
-** Anton's Hello Triangle tutorial
+** DONE Anton's Hello Triangle tutorial
+CLOSED: [2026-05-18 Mon 20:15]
 https://antongerdelan.net/opengl/hellotriangle.html
-** Anton's Extended Initialisation tutorial
+** DONE Move shader code into functions
+CLOSED: [2026-05-20 Wed 10:38]
+https://www.youtube.com/watch?v=71BLZwRGUJE&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=8
+** DONE Watch relevant The Cherno videos
+CLOSED: [2026-05-20 Wed 14:31]
+** DONE Anton's Hello Triangle questions
+CLOSED: [2026-05-20 Wed 15:15]
+** DONE Anton's Extended Initialisation tutorial
+CLOSED: [2026-05-21 Thu 17:20]
 https://antongerdelan.net/opengl/glcontext2.html
-** Read "Getting started" tutorial from GLFW
+** CANCELLED Read "Getting started" tutorial from GLFW
+CLOSED: [2026-05-20 Wed 15:18]
 https://www.glfw.org/docs/latest/quick_guide.html
-** Read "Introduction to the API" tutorial from GLFW
+** CANCELLED Read "Introduction to the API" tutorial from GLFW
+CLOSED: [2026-05-20 Wed 15:18]
 - and look at the other guides on this page
-** Read Debugging tutorial
+** DONE Read Debugging tutorial
+CLOSED: [2026-05-21 Thu 19:01]
 https://learnopengl.com/In-Practice/Debugging
-** Hello Triangle exercises
+** DONE Hello Triangle exercises
+CLOSED: [2026-05-22 Fri 22:08]
+** Rename GettingStarted folder to something like Triangle
+* GLFW
+- https://www.glfw.org/docs/latest/window_guide.html
+  - also a bunch of sub tutorials on this page
+* Other tutorials
+https://www.opengl-tutorial.org/
 * Project ideas
 ** Moving screen moves view
 - I'd you move the game window it also moves where you are looking in the game

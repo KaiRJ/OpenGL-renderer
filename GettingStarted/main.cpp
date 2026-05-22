@@ -2,43 +2,46 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
+#include <string>
+#include <string_view>
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
+                                   GLenum severity, GLsizei length, const char* message,
+                                   const void* userParam);
+
+static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+static void processInput(GLFWwindow* window);
+static std::string parseShader(std::string_view path);
+static unsigned int createShader(unsigned int type, const char* source);
+static unsigned int createShaderProgram(unsigned int vertexShader,
+                                        unsigned int fragmentShader);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// shaders
-const char* vertexShaderSource = "#version 460 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                 "}\0";
-
-const char* fragmentShaderSource = "#version 460 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-                                   "}\n\0";
-
 int main()
 {
     // glfw: initialize and configure
     // ------------------------------
-    glfwInit();
+    if (!glfwInit())
+    {
+        std::cout << "Failed to start GLFW" << std::endl;
+        return -1;
+    }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true); // slow!
 
     // glfw: window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-    if (window == NULL)
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
+    if (window == nullptr)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -55,91 +58,89 @@ int main()
         return -1;
     }
 
-    // build and compile the shader program
-    // ------------------------------------
-    int success;
-    char infoLog[512];
-
-    // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
+    // initialise debug output
+    // -----------------------
+    int flags;
+    glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
     {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(glDebugOutput, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
+                              GL_TRUE);
     }
 
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n"
-                  << infoLog << std::endl;
-    }
+    // build and compile the shader programs
+    // -------------------------------------
+    std::string vertexSource {parseShader("shaders/shader.vert")};
+    unsigned int vertexShader {createShader(GL_VERTEX_SHADER, vertexSource.data())};
 
-    // link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
+    std::string fragmentSource {parseShader("shaders/shader1.frag")};
+    unsigned int fragmentShader {createShader(GL_FRAGMENT_SHADER, fragmentSource.data())};
+    unsigned int shaderProgram1 = createShaderProgram(vertexShader, fragmentShader);
 
-    // don't need these anymore
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    fragmentSource = parseShader("shaders/shader2.frag");
+    fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentSource.data());
+    unsigned int shaderProgram2 = createShaderProgram(vertexShader, fragmentShader);
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float vertices[] = {
-        0.5f,  0.5f,  0.0f, // top right
-        0.5f,  -0.5f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f,  0.0f  // top left
+    float firstTriangle[] = {
+        -0.9f,  -0.5f, 0.0f, // left
+        -0.0f,  -0.5f, 0.0f, // right
+        -0.45f, 0.5f,  0.0f, // top
     };
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+    float secondTriangle[] = {
+        0.0f,  -0.5f, 0.0f, // left
+        0.9f,  -0.5f, 0.0f, // right
+        0.45f, 0.5f,  0.0f  // top
     };
 
-    // setup VAO, VBO, and EBO
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    // setup VAOs, VBOs, and EBO
+    unsigned int VAOs[2];
+    glGenVertexArrays(2, VAOs);
 
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    unsigned int VBOs[2];
+    glGenBuffers(2, VBOs);
+
+    // first triangle setup
+    glBindVertexArray(VAOs[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
     glEnableVertexAttribArray(0);
 
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // second triangle setup
+    glBindVertexArray(VAOs[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+    glEnableVertexAttribArray(0);
 
     // uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // render loop
+    double prev_s {glfwGetTime()};
+    double title_countdown_s {};
     while (!glfwWindowShouldClose(window))
     {
+        // timing
+        // ------
+        double curr_s {glfwGetTime()};
+        double elapsed_s {curr_s - prev_s};
+        prev_s = curr_s;
+
+        title_countdown_s -= elapsed_s;
+        if (title_countdown_s <= 0.0 && elapsed_s > 0.0)
+        {
+            double fps {1.0 / elapsed_s};
+            std::string str {"FPS " + std::to_string(fps)};
+            glfwSetWindowTitle(window, str.c_str());
+            title_countdown_s = 0.5;
+        }
+
         // input
         // -----
         processInput(window);
@@ -149,10 +150,15 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // draw triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        // draw first triangle
+        glUseProgram(shaderProgram1);
+        glBindVertexArray(VAOs[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // draw second triangle
+        glUseProgram(shaderProgram2);
+        glBindVertexArray(VAOs[1]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // swap buffers and poll IO events
         // -------------------------------
@@ -162,14 +168,103 @@ int main()
 
     // de-allocate all resources
     // -------------------------
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteProgram(shaderProgram);
+    glDeleteVertexArrays(2, VAOs);
+    glDeleteBuffers(2, VBOs);
+    glDeleteProgram(shaderProgram1);
+    glDeleteProgram(shaderProgram2);
 
     // glfw: terminate
     // ---------------
     glfwTerminate();
     return 0;
+}
+
+// Helper function for printing OpenGL errors
+// ------------------------------------------
+static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
+                                   GLenum severity, GLsizei length, const char* message,
+                                   const void* userParam)
+{
+    // ignore non-significant error/warning codes
+    if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
+        return;
+
+    std::cout << "---------------" << std::endl;
+    std::cout << "Debug message (" << id << "): " << message << std::endl;
+
+    switch (source)
+    {
+    case GL_DEBUG_SOURCE_API:
+        std::cout << "Source: API";
+        break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+        std::cout << "Source: Window System";
+        break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER:
+        std::cout << "Source: Shader Compiler";
+        break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:
+        std::cout << "Source: Third Party";
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+        std::cout << "Source: Application";
+        break;
+    case GL_DEBUG_SOURCE_OTHER:
+        std::cout << "Source: Other";
+        break;
+    }
+    std::cout << std::endl;
+
+    switch (type)
+    {
+    case GL_DEBUG_TYPE_ERROR:
+        std::cout << "Type: Error";
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        std::cout << "Type: Deprecated Behaviour";
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+        std::cout << "Type: Undefined Behaviour";
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+        std::cout << "Type: Portability";
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+        std::cout << "Type: Performance";
+        break;
+    case GL_DEBUG_TYPE_MARKER:
+        std::cout << "Type: Marker";
+        break;
+    case GL_DEBUG_TYPE_PUSH_GROUP:
+        std::cout << "Type: Push Group";
+        break;
+    case GL_DEBUG_TYPE_POP_GROUP:
+        std::cout << "Type: Pop Group";
+        break;
+    case GL_DEBUG_TYPE_OTHER:
+        std::cout << "Type: Other";
+        break;
+    }
+    std::cout << std::endl;
+
+    switch (severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH:
+        std::cout << "Severity: high";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        std::cout << "Severity: medium";
+        break;
+    case GL_DEBUG_SEVERITY_LOW:
+        std::cout << "Severity: low";
+        break;
+    case GL_DEBUG_SEVERITY_NOTIFICATION:
+        std::cout << "Severity: notification";
+        break;
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::exit(-1);
 }
 
 // whenever the window size changed this callback function executes
@@ -185,4 +280,67 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+// read shader code from file
+// --------------------------
+static std::string parseShader(std::string_view path)
+{
+    std::ifstream stream {path.data()};
+    std::string line;
+    std::stringstream ss;
+    while (getline(stream, line))
+    {
+        ss << line << "\n";
+    }
+
+    return ss.str();
+}
+
+// create a shader
+// ---------------
+static unsigned int createShader(unsigned int type, const char* source)
+{
+    unsigned int shader {glCreateShader(type)};
+    glShaderSource(shader, 1, &source, nullptr);
+    glCompileShader(shader);
+
+    // get any debug information
+    int success;
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+        std::cout << "ERROR::SHADER::"
+                  << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT")
+                  << "::COMPILATION_FAILED\n " << infoLog << std::endl;
+    }
+
+    return shader;
+}
+
+// link vertex and fragment shaders into a program
+// -----------------------------------------------
+static unsigned int createShaderProgram(unsigned int vertexShader,
+                                        unsigned int fragmentShader)
+{
+    unsigned int program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
+
+    // get any debug information
+    int success;
+    char infoLog[512];
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(program, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::PROGRRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    return program;
 }

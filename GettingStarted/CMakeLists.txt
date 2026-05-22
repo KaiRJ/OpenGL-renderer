@@ -33,3 +33,15 @@ target_link_libraries(main
     Xrandr
     Xi
 )
+
+# Copy shaders into build directory
+file(GLOB SHADER_FILES "${CMAKE_SOURCE_DIR}/shaders/*")
+foreach(shader ${SHADER_FILES})
+    get_filename_component(shader_name ${shader} NAME)
+
+    add_custom_command(TARGET main POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${shader}
+            ${CMAKE_BINARY_DIR}/shaders/${shader_name}
+    )
+endforeach()
