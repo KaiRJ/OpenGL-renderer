@@ -37,7 +37,18 @@ CLOSED: [2026-05-21 Thu 19:01]
 https://learnopengl.com/In-Practice/Debugging
 ** DONE Hello Triangle exercises
 CLOSED: [2026-05-22 Fri 22:08]
-** Rename GettingStarted folder to something like Triangle
+** DONE Rename GettingStarted folder to something like Triangle
+CLOSED: [2026-05-22 Fri 22:18]
+** DONE Shaders tutorial
+CLOSED: [2026-05-27 Wed 18:18]
+** Add repo to github
+** Watch relevant The Cherno vidoes
+- up to like abstracting OpenGL into classes
+** Anton's OpenGL 4 Shaders tutorial
+** Shaders tutorial exercises
+* Articles
+** No Graphics API - Sebastian Aaltonen
+https://www.sebastianaaltonen.com/blog/no-graphics-api
 * GLFW
 - https://www.glfw.org/docs/latest/window_guide.html
   - also a bunch of sub tutorials on this page

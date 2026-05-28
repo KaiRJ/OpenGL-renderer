@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -73,13 +74,14 @@ int main()
 
     // build and compile the shader programs
     // -------------------------------------
-    std::string vertexSource {parseShader("shaders/shader.vert")};
+    std::string vertexSource {parseShader("shaders/shader1.vert")};
     unsigned int vertexShader {createShader(GL_VERTEX_SHADER, vertexSource.data())};
-
     std::string fragmentSource {parseShader("shaders/shader1.frag")};
     unsigned int fragmentShader {createShader(GL_FRAGMENT_SHADER, fragmentSource.data())};
     unsigned int shaderProgram1 = createShaderProgram(vertexShader, fragmentShader);
 
+    vertexSource = parseShader("shaders/shader2.vert");
+    vertexShader = createShader(GL_VERTEX_SHADER, vertexSource.data());
     fragmentSource = parseShader("shaders/shader2.frag");
     fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentSource.data());
     unsigned int shaderProgram2 = createShaderProgram(vertexShader, fragmentShader);
@@ -92,9 +94,10 @@ int main()
         -0.45f, 0.5f,  0.0f, // top
     };
     float secondTriangle[] = {
-        0.0f,  -0.5f, 0.0f, // left
-        0.9f,  -0.5f, 0.0f, // right
-        0.45f, 0.5f,  0.0f  // top
+        // position                     // colour
+        0.0f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
+        0.9f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
+        0.45f, 0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
     };
 
     // setup VAOs, VBOs, and EBO
@@ -115,8 +118,11 @@ int main()
     glBindVertexArray(VAOs[1]);
     glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                          (const void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // uncomment this call to draw in wireframe polygons.
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -145,17 +151,28 @@ int main()
         // -----
         processInput(window);
 
-        // render
-        // ------
+        // clear colour buffer
+        // -------------------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw first triangle
+        // -------------------
+        // activate correct shader
         glUseProgram(shaderProgram1);
+
+        // update uniform colour
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(shaderProgram1, "u_colour");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
+        // rend the triangle
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // draw second triangle
+        // --------------------
         glUseProgram(shaderProgram2);
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
