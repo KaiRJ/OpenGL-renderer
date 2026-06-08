@@ -2,12 +2,12 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include <cassert>
 #include <cmath>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <string>
-#include <string_view>
+
+#include "shader.h"
 
 static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
                                    GLenum severity, GLsizei length, const char* message,
@@ -15,10 +15,6 @@ static void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
 
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void processInput(GLFWwindow* window);
-static std::string parseShader(std::string_view path);
-static unsigned int createShader(unsigned int type, const char* source);
-static unsigned int createShaderProgram(unsigned int vertexShader,
-                                        unsigned int fragmentShader);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -74,17 +70,8 @@ int main()
 
     // build and compile the shader programs
     // -------------------------------------
-    std::string vertexSource {parseShader("shaders/shader1.vert")};
-    unsigned int vertexShader {createShader(GL_VERTEX_SHADER, vertexSource.data())};
-    std::string fragmentSource {parseShader("shaders/shader1.frag")};
-    unsigned int fragmentShader {createShader(GL_FRAGMENT_SHADER, fragmentSource.data())};
-    unsigned int shaderProgram1 = createShaderProgram(vertexShader, fragmentShader);
-
-    vertexSource = parseShader("shaders/shader2.vert");
-    vertexShader = createShader(GL_VERTEX_SHADER, vertexSource.data());
-    fragmentSource = parseShader("shaders/shader2.frag");
-    fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentSource.data());
-    unsigned int shaderProgram2 = createShaderProgram(vertexShader, fragmentShader);
+    Shader shaderProgram1("shaders/shader1.vert", "shaders/shader1.frag");
+    Shader shaderProgram2("shaders/shader2.vert", "shaders/shader2.frag");
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -132,9 +119,10 @@ int main()
     double title_countdown_s {};
     while (!glfwWindowShouldClose(window))
     {
-        // timing
-        // ------
         double curr_s {glfwGetTime()};
+
+        // frame rate
+        // ----------
         double elapsed_s {curr_s - prev_s};
         prev_s = curr_s;
 
@@ -159,21 +147,28 @@ int main()
         // draw first triangle
         // -------------------
         // activate correct shader
-        glUseProgram(shaderProgram1);
+        shaderProgram1.use();
 
-        // update uniform colour
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram1, "u_colour");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        // update uniform time
+        int time_loc {glGetUniformLocation(shaderProgram1.ID, "u_time_s")};
+        assert(time_loc != -1);
+        glUniform1f(time_loc, curr_s);
 
-        // rend the triangle
+        // render the triangle
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // draw second triangle
         // --------------------
-        glUseProgram(shaderProgram2);
+        // activate correct shader
+        shaderProgram2.use();
+
+        // update uniform time
+        time_loc = glGetUniformLocation(shaderProgram2.ID, "u_time_s");
+        assert(time_loc != -1);
+        glUniform1f(time_loc, curr_s);
+
+        // render the triangle
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -187,8 +182,6 @@ int main()
     // -------------------------
     glDeleteVertexArrays(2, VAOs);
     glDeleteBuffers(2, VBOs);
-    glDeleteProgram(shaderProgram1);
-    glDeleteProgram(shaderProgram2);
 
     // glfw: terminate
     // ---------------
@@ -297,67 +290,4 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-}
-
-// read shader code from file
-// --------------------------
-static std::string parseShader(std::string_view path)
-{
-    std::ifstream stream {path.data()};
-    std::string line;
-    std::stringstream ss;
-    while (getline(stream, line))
-    {
-        ss << line << "\n";
-    }
-
-    return ss.str();
-}
-
-// create a shader
-// ---------------
-static unsigned int createShader(unsigned int type, const char* source)
-{
-    unsigned int shader {glCreateShader(type)};
-    glShaderSource(shader, 1, &source, nullptr);
-    glCompileShader(shader);
-
-    // get any debug information
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::"
-                  << (type == GL_VERTEX_SHADER ? "VERTEX" : "FRAGMENT")
-                  << "::COMPILATION_FAILED\n " << infoLog << std::endl;
-    }
-
-    return shader;
-}
-
-// link vertex and fragment shaders into a program
-// -----------------------------------------------
-static unsigned int createShaderProgram(unsigned int vertexShader,
-                                        unsigned int fragmentShader)
-{
-    unsigned int program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-
-    // get any debug information
-    int success;
-    char infoLog[512];
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    return program;
 }
