@@ -49,12 +49,15 @@ CLOSED: [2026-06-05 Fri 17:02]
 CLOSED: [2026-06-08 Mon 17:54]
 *** DONE Move class files into src and include folders
 CLOSED: [2026-06-08 Mon 18:11]
+*** Convert main to use new classes for vertex and index buffer
+- maybe reread what these are as dont think i acc use the index buffer
 *** Watch relevant The Cherno vidoes
 - up to like abstracting OpenGL into classes
 *** Shaders tutorial exercises
 *** Anton's OpenGL 4 Shaders tutorial possible extensions
 - make note of useful links in this section also
-
+*** Turn this whole project into one render application
+- feel there are all building on the previous and could be one project
 * GLFW
 - https://www.glfw.org/docs/latest/window_guide.html
   - also a bunch of sub tutorials on this page
@@ -64,6 +67,7 @@ CLOSED: [2026-06-08 Mon 18:11]
 * Raytracing
 - https://raytracing.github.io/
 - Physically based rendering
+- https://www.reddit.com/r/GraphicsProgramming/comments/1u79ryw/i_wrote_a_c_path_tracer_from_scratch_without_ai/
 * Articles
 ** No Graphics API - Sebastian Aaltonen
 https://www.sebastianaaltonen.com/blog/no-graphics-api
@@ -112,7 +116,8 @@ https://www.sebastianaaltonen.com/blog/no-graphics-api
 
   - https://www.youtube.com/watch?v=JxIZbV_XjAs&list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT
   - https://www.youtube.com/playlist?list=PLQ7CpbxNS-_YP1WhUAVmxRQuF_a4PLju_
-
+** Open source projects
+https://github.com/HG9032/OpenGLengine
 * Vulkan
 or DX13
 ** Learn Vulkan
@@ -122,3 +127,4 @@ or DX13
 - mainly as practice for the flahship project
 ** Flagship project
 eg. mini game engine in vulkan
+** Godot contributions

@@ -1,56 +1,14 @@
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
+#include "Renderer.h"
+#include "Shader.h"
+#include "Window.h"
 
 #include <cassert>
 #include <cmath>
-#include <iostream>
-#include <string>
-
-#include "Renderer.h"
-#include "Shader.h"
-
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-static void processInput(GLFWwindow* window);
-
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+#include <glad/glad.h>
 
 int main()
 {
-    // glfw: initialize and configure
-    // ------------------------------
-    if (!glfwInit())
-    {
-        std::cout << "Failed to start GLFW" << std::endl;
-        return -1;
-    }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL version
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true); // slow!
-
-    // glfw: window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
-    if (window == nullptr)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+    Window window {};
 
     // initialise debug output
     // -----------------------
@@ -114,27 +72,13 @@ int main()
     // render loop
     double prev_s {glfwGetTime()};
     double title_countdown_s {};
-    while (!glfwWindowShouldClose(window))
+    while (!window.ShouldClose())
     {
         double curr_s {glfwGetTime()};
 
-        // frame rate
-        // ----------
-        double elapsed_s {curr_s - prev_s};
-        prev_s = curr_s;
-
-        title_countdown_s -= elapsed_s;
-        if (title_countdown_s <= 0.0 && elapsed_s > 0.0)
-        {
-            double fps {1.0 / elapsed_s};
-            std::string str {"FPS " + std::to_string(fps)};
-            glfwSetWindowTitle(window, str.c_str());
-            title_countdown_s = 0.5;
-        }
-
         // input
         // -----
-        processInput(window);
+        window.ProcessInput();
 
         // clear colour buffer
         // -------------------
@@ -171,7 +115,7 @@ int main()
 
         // swap buffers and poll IO events
         // -------------------------------
-        glfwSwapBuffers(window);
+        window.SwapBuffers();
         glfwPollEvents();
     }
 
@@ -184,19 +128,4 @@ int main()
     // ---------------
     glfwTerminate();
     return 0;
-}
-
-// whenever the window size changed this callback function executes
-// ----------------------------------------------------------------
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-// process all input accordingly
-// -----------------------------
-static void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
 }
