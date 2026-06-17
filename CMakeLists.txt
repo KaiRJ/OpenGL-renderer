@@ -19,6 +19,7 @@ target_include_directories(main
   PRIVATE
   ${GLFW_INCLUDE_DIRS}
   include
+  Libraries
 )
 
 # Link GLFW and OpenGL (and dl, pthread, X11 for Linux)
