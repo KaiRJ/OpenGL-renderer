@@ -1,5 +1,6 @@
 #include "Debug.h"
 #include "Shader.h"
+#include "VertexBuffer.h"
 #include "Window.h"
 
 #include <cassert>
@@ -19,54 +20,40 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float firstTriangle[] = {
+    unsigned int VAOs[2];
+    glGenVertexArrays(2, VAOs);
+
+    // first triangle setup
+    glBindVertexArray(VAOs[0]);
+    float positions[] = {
         -0.9f,  -0.5f, 0.0f, // left
         -0.0f,  -0.5f, 0.0f, // right
         -0.45f, 0.5f,  0.0f, // top
     };
-    float secondTriangle[] = {
-        // position                     // colour
-        0.0f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
-        0.9f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
-        0.45f, 0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
-    };
-
-    // setup VAOs and VBOs
-    unsigned int VAOs[2];
-    glGenVertexArrays(2, VAOs);
-
-    unsigned int VBOs[2];
-    glGenBuffers(2, VBOs);
-
-    // first triangle setup
-    glBindVertexArray(VAOs[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(firstTriangle), firstTriangle, GL_STATIC_DRAW);
+    auto solidTriangle = new VertexBuffer(positions, sizeof(positions));
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const void*)0);
     glEnableVertexAttribArray(0);
 
     // second triangle setup
     glBindVertexArray(VAOs[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(secondTriangle), secondTriangle, GL_STATIC_DRAW);
+    float positionsAndColours[] = {
+        // position                     // colour
+        0.0f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
+        0.9f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
+        0.45f, 0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
+    };
+    auto movingTriangle =
+        new VertexBuffer(positionsAndColours, sizeof(positionsAndColours));
+    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (const void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                           (const void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // uncomment this call to draw in wireframe polygons.
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     // render loop
-    double prev_s {glfwGetTime()};
-    double title_countdown_s {};
     while (!window.ShouldClose())
     {
-        double curr_s {glfwGetTime()};
-
-        // input
-        // -----
         window.ProcessInput();
 
         // clear colour buffer
@@ -76,13 +63,12 @@ int main()
 
         // draw first triangle
         // -------------------
-        // activate correct shader
         shaderProgram1.use();
 
         // update uniform time
         int time_loc {glGetUniformLocation(shaderProgram1.ID, "u_time_s")};
         assert(time_loc != -1);
-        glUniform1f(time_loc, curr_s);
+        glUniform1f(time_loc, glfwGetTime());
 
         // render the triangle
         glBindVertexArray(VAOs[0]);
@@ -90,31 +76,25 @@ int main()
 
         // draw second triangle
         // --------------------
-        // activate correct shader
         shaderProgram2.use();
 
         // update uniform time
         time_loc = glGetUniformLocation(shaderProgram2.ID, "u_time_s");
         assert(time_loc != -1);
-        glUniform1f(time_loc, curr_s);
+        glUniform1f(time_loc, glfwGetTime());
 
         // render the triangle
         glBindVertexArray(VAOs[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        // swap buffers and poll IO events
-        // -------------------------------
         window.SwapBuffers();
         glfwPollEvents();
     }
 
-    // de-allocate all resources
-    // -------------------------
+    delete solidTriangle;
+    delete movingTriangle;
     glDeleteVertexArrays(2, VAOs);
-    glDeleteBuffers(2, VBOs);
-
-    // glfw: terminate
-    // ---------------
     glfwTerminate();
+
     return 0;
 }

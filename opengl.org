@@ -49,20 +49,25 @@ CLOSED: [2026-06-05 Fri 17:02]
 CLOSED: [2026-06-08 Mon 17:54]
 *** DONE Move class files into src and include folders
 CLOSED: [2026-06-08 Mon 18:11]
-*** Convert main to use new classes for vertex and index buffer
+*** DONE Convert main to use new classes for vertex and index buffer
+CLOSED: [2026-06-17 Wed 00:53]
 - maybe reread what these are as dont think i acc use the index buffer
+*** DONE Turn this whole project into one render application
+CLOSED: [2026-06-17 Wed 00:58]
+- feel there are all building on the previous and could be one project
 *** Watch relevant The Cherno vidoes
 - up to like abstracting OpenGL into classes
 *** Shaders tutorial exercises
 *** Anton's OpenGL 4 Shaders tutorial possible extensions
 - make note of useful links in this section also
-*** Turn this whole project into one render application
-- feel there are all building on the previous and could be one project
 * GLFW
 - https://www.glfw.org/docs/latest/window_guide.html
   - also a bunch of sub tutorials on this page
 * Shaders
 - shadertoy
+- bake in a bunch of shader into the render
+  - could make a tool to select which to apply
+  - this could pair well with learning how to make GUIs in C++
 
 * Raytracing
 - https://raytracing.github.io/
@@ -71,6 +76,11 @@ CLOSED: [2026-06-08 Mon 18:11]
 * Articles
 ** No Graphics API - Sebastian Aaltonen
 https://www.sebastianaaltonen.com/blog/no-graphics-api
+* Other tutorials
+- https://www.opengl-tutorial.org/
+- https://www.scratchapixel.com/index.html
+- https://fgiesen.wordpress.com/2011/07/09/a-trip-through-the-graphics-pipeline-2011-index/
+
 * Books
 - read when start opengl engine or render
   https://www.gameenginebook.com/
@@ -80,11 +90,6 @@ https://www.sebastianaaltonen.com/blog/no-graphics-api
   Real-Time Collision Detection
   Real-Time Rendering
   Physically based rendering
-
-* Other tutorials
-- https://www.opengl-tutorial.org/
-- https://www.scratchapixel.com/index.html
-- https://fgiesen.wordpress.com/2011/07/09/a-trip-through-the-graphics-pipeline-2011-index/
 
 * Project ideas
 ** Moving screen moves view
