@@ -13,7 +13,7 @@ class IndexBuffer
     unsigned int GetCount() const;
 
   private:
-    unsigned int m_rendererID;
+    unsigned int m_bufferID;
     unsigned int m_count;
 };
 
