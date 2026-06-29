@@ -1,5 +1,6 @@
 #include "Shader.h"
 
+#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -19,12 +20,33 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     std::string fragmentSource {parseShader(fragmentPath)};
     unsigned int fragmentShader {createShader(GL_FRAGMENT_SHADER, fragmentSource.data())};
 
-    ID = createShaderProgram(vertexShader, fragmentShader);
+    m_shaderID = createShaderProgram(vertexShader, fragmentShader);
 }
 
-void Shader::getUniformLocation(const std::string& name, bool value) const
+Shader::~Shader() {}
+
+void Shader::Bind() const { glUseProgram(m_shaderID); };
+
+void Shader::Unbind() const { glUseProgram(0); };
+
+int Shader::GetUniformLocation(const std::string& name)
 {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+    if (m_uniformLocationCache.find(name) != m_uniformLocationCache.end())
+        return m_uniformLocationCache[name];
+
+    int location {glGetUniformLocation(m_shaderID, name.c_str())};
+    if (location == -1)
+        std::cout << "Warning: uniform '" << name << " doesn't exist!" << std::endl;
+    else
+        m_uniformLocationCache[name] = location;
+
+    return location;
+}
+
+void Shader::SetUniform1f(const std::string& name, float value)
+{
+    int location {GetUniformLocation(name)};
+    glUniform1f(location, value);
 }
 
 // read shader code from file

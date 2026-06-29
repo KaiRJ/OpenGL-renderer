@@ -3,17 +3,25 @@
 
 #include <glad/glad.h>
 #include <string>
+#include <unordered_map>
 
 class Shader
 {
   public:
     Shader(const char* vertexPath, const char* fragmentPath);
+    ~Shader();
 
-    unsigned int ID;
+    void Bind() const;
+    void Unbind() const;
 
-    void use() const { glUseProgram(ID); };
+    // Set uniforms
+    void SetUniform1f(const std::string& name, float value);
 
-    void getUniformLocation(const std::string& name, bool value) const;
+  private:
+    unsigned int m_shaderID {};
+    std::unordered_map<std::string, int> m_uniformLocationCache {};
+
+    int GetUniformLocation(const std::string& name);
 };
 
 #endif

@@ -54,10 +54,8 @@ int main()
 
             // draw first triangle
             // -------------------
-            shaderProgram1.use();
-            int time_loc {glGetUniformLocation(shaderProgram1.ID, "u_time_s")};
-            assert(time_loc != -1);
-            glUniform1f(time_loc, glfwGetTime());
+            shaderProgram1.Bind();
+            shaderProgram1.SetUniform1f("u_time_s", glfwGetTime());
 
             // render the triangle
             va1.Bind();
@@ -65,10 +63,8 @@ int main()
 
             // draw second triangle
             // --------------------
-            shaderProgram2.use();
-            time_loc = glGetUniformLocation(shaderProgram2.ID, "u_time_s");
-            assert(time_loc != -1);
-            glUniform1f(time_loc, glfwGetTime());
+            shaderProgram2.Bind();
+            shaderProgram2.SetUniform1f("u_time_s", glfwGetTime());
 
             // render the triangle
             va2.Bind();
