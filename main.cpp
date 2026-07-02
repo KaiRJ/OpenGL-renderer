@@ -1,4 +1,5 @@
 #include "Debug.h"
+#include "Renderer.h"
 #include "Shader.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -16,8 +17,8 @@ int main()
 
     { // ensure objects are destroyed before glfwTerminate()
         // shader programs setup
-        Shader shaderProgram1("shaders/shader1.vert", "shaders/shader1.frag");
-        Shader shaderProgram2("shaders/shader2.vert", "shaders/shader2.frag");
+        Shader shader1("shaders/shader1.vert", "shaders/shader1.frag");
+        Shader shader2("shaders/shader2.vert", "shaders/shader2.frag");
 
         // first triangle setup
         float positions[] = {
@@ -45,30 +46,17 @@ int main()
         layout2.Push<float>(3);
         va2.AddBuffer(vb2, layout2);
 
+        // Renderer object for drawing
+        Renderer renderer {};
+
         // render loop
         while (!window.ShouldClose())
         {
             window.ProcessInput();
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
 
-            // draw first triangle
-            // -------------------
-            shaderProgram1.Bind();
-            shaderProgram1.SetUniform1f("u_time_s", glfwGetTime());
-
-            // render the triangle
-            va1.Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-
-            // draw second triangle
-            // --------------------
-            shaderProgram2.Bind();
-            shaderProgram2.SetUniform1f("u_time_s", glfwGetTime());
-
-            // render the triangle
-            va2.Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 3);
+            // draw triangles
+            renderer.Draw(va1, shader1, 3);
+            renderer.Draw(va2, shader2, 3);
 
             window.SwapBuffers();
             glfwPollEvents();
