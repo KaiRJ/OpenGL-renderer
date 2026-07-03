@@ -5,15 +5,13 @@
 #include <iostream>
 #include <sstream>
 
-static std::string parseShader(std::string_view path);
-static unsigned int createShader(unsigned int type, const char* source);
-static unsigned int createShaderProgram(unsigned int vertexShader,
-                                        unsigned int fragmentShader);
+std::string parseShader(std::string_view path);
+unsigned int createShader(unsigned int type, const char* source);
+unsigned int createShaderProgram(unsigned int vertexShader, unsigned int fragmentShader);
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
     // build and compile the shader program
-    // ------------------------------------
     std::string vertexSource {parseShader(vertexPath)};
     unsigned int vertexShader {createShader(GL_VERTEX_SHADER, vertexSource.data())};
 
@@ -50,8 +48,7 @@ void Shader::SetUniform1f(const std::string& name, float value)
 }
 
 // read shader code from file
-// --------------------------
-static std::string parseShader(std::string_view path)
+std::string parseShader(std::string_view path)
 {
     std::ifstream stream {path.data()};
     stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -69,9 +66,8 @@ static std::string parseShader(std::string_view path)
     return ss.str();
 }
 
-// create a shader
-// ---------------
-static unsigned int createShader(unsigned int type, const char* source)
+// create a shader from source code
+unsigned int createShader(unsigned int type, const char* source)
 {
     unsigned int shader {glCreateShader(type)};
     glShaderSource(shader, 1, &source, nullptr);
@@ -93,9 +89,7 @@ static unsigned int createShader(unsigned int type, const char* source)
 }
 
 // link vertex and fragment shaders into a program
-// -----------------------------------------------
-static unsigned int createShaderProgram(unsigned int vertexShader,
-                                        unsigned int fragmentShader)
+unsigned int createShaderProgram(unsigned int vertexShader, unsigned int fragmentShader)
 {
     unsigned int program = glCreateProgram();
     glAttachShader(program, vertexShader);

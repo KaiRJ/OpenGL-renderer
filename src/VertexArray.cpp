@@ -1,5 +1,4 @@
 #include "VertexArray.h"
-#include <cstdint>
 
 VertexArray::VertexArray() { glGenVertexArrays(1, &m_bufferID); }
 

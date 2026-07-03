@@ -1,7 +1,6 @@
 #ifndef VERTEX_ARRAY_LAYOUT_H
 #define VERTEX_ARRAY_LAYOUT_H
 
-#include "Debug.h"
 #include <glad/glad.h>
 #include <vector>
 
@@ -25,8 +24,8 @@ class VertexBufferLayout
     void Push(unsigned int count);
 
   private:
-    std::vector<VertexBufferElement> m_Elements {};
-    unsigned int m_Stride {};
+    std::vector<VertexBufferElement> m_elements {};
+    unsigned int m_stride {};
 };
 
 #endif

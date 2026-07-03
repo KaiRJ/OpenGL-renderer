@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "IndexBuffer.h"
 
 Renderer::Renderer() {}
 
@@ -17,5 +18,10 @@ void Renderer::Draw(const VertexArray& va, const Shader& s, int count) const
     glDrawArrays(GL_TRIANGLES, 0, count);
 }
 
-// shaderProgram1.SetUniform1f("u_time_s", glfwGetTime());
-// shaderProgram2.SetUniform1f("u_time_s", glfwGetTime());
+void Renderer::Draw(const VertexArray& va, const Shader& s, const IndexBuffer& ib) const
+{
+    va.Bind();
+    s.Bind();
+    ib.Bind();
+    glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, 0);
+}
