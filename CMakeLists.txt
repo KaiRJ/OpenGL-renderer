@@ -9,7 +9,7 @@ find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
 # Source files
-file(GLOB SOURCES src/* externals/glad/glad.c)
+file(GLOB SOURCES src/* Libraries/glad/glad.c)
 
 # Create executable
 add_executable(main main.cpp ${SOURCES})
@@ -19,7 +19,7 @@ target_include_directories(main
   PRIVATE
   ${GLFW_INCLUDE_DIRS}
   include
-  externals/
+  Libraries/
 )
 
 # Link GLFW and OpenGL (and dl, pthread, X11 for Linux)
