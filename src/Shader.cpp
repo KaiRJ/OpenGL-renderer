@@ -7,18 +7,11 @@
 
 std::string parseShader(std::string_view path);
 unsigned int createShader(unsigned int type, const char* source);
-unsigned int createShaderProgram(unsigned int vertexShader, unsigned int fragmentShader);
+unsigned int createShaderProgram(const char* vertexPath, const char* fragmentPath);
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
-    // build and compile the shader program
-    std::string vertexSource {parseShader(vertexPath)};
-    unsigned int vertexShader {createShader(GL_VERTEX_SHADER, vertexSource.data())};
-
-    std::string fragmentSource {parseShader(fragmentPath)};
-    unsigned int fragmentShader {createShader(GL_FRAGMENT_SHADER, fragmentSource.data())};
-
-    m_shaderID = createShaderProgram(vertexShader, fragmentShader);
+    m_shaderID = createShaderProgram(vertexPath, fragmentPath);
 }
 
 Shader::~Shader() {}
@@ -39,6 +32,17 @@ int Shader::GetUniformLocation(const std::string& name)
         m_uniformLocationCache[name] = location;
 
     return location;
+}
+
+void Shader::Reload(const char* vertexPath, const char* fragmentPath)
+{
+    unsigned int new_programID {createShaderProgram(vertexPath, fragmentPath)};
+
+    if (new_programID)
+    {
+        glDeleteProgram(m_shaderID);
+        m_shaderID = new_programID;
+    }
 }
 
 void Shader::SetUniform1f(const std::string& name, float value)
@@ -89,8 +93,16 @@ unsigned int createShader(unsigned int type, const char* source)
 }
 
 // link vertex and fragment shaders into a program
-unsigned int createShaderProgram(unsigned int vertexShader, unsigned int fragmentShader)
+unsigned int createShaderProgram(const char* vertexPath, const char* fragmentPath)
 {
+    // build and compile the shaders
+    std::string vertexSource {parseShader(vertexPath)};
+    unsigned int vertexShader {createShader(GL_VERTEX_SHADER, vertexSource.data())};
+
+    std::string fragmentSource {parseShader(fragmentPath)};
+    unsigned int fragmentShader {createShader(GL_FRAGMENT_SHADER, fragmentSource.data())};
+
+    // link shaders to shader program
     unsigned int program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);

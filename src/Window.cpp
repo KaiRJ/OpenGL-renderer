@@ -16,26 +16,31 @@ Window::Window()
 
 void Window::CreateWindow()
 {
-    window = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
-    if (window == nullptr)
+    m_window = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
+    if (m_window == nullptr)
     {
         throw std::runtime_error("Failed to create GLFW window");
     }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwMakeContextCurrent(m_window);
+    glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
 }
 
-void Window::ProcessInput()
+bool Window::WasKeyPressed(int key) const
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    return glfwGetKey(m_window, key) == GLFW_PRESS;
+}
+
+void Window::ProcessInput() const
+{
+    if (WasKeyPressed(GLFW_KEY_ESCAPE))
     {
-        glfwSetWindowShouldClose(window, true);
+        glfwSetWindowShouldClose(m_window, true);
     }
 }
 
-bool Window::ShouldClose() { return glfwWindowShouldClose(window); }
+bool Window::ShouldClose() const { return glfwWindowShouldClose(m_window); }
 
-void Window::SwapBuffers() { glfwSwapBuffers(window); }
+void Window::SwapBuffers() const { glfwSwapBuffers(m_window); }
 
 // initialize and configure glfw
 // -----------------------------

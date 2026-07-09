@@ -11,7 +11,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <iostream>
 
 namespace
 {
@@ -43,8 +42,13 @@ int main()
 
     { // ensure objects are destroyed before glfwTerminate()
         // shader programs setup
-        Shader shader1("shaders/shader1.vert", "shaders/shader1.frag");
-        Shader shader2("shaders/shader2.vert", "shaders/shader2.frag");
+        const char* vertexShader1Path {"shaders/shader1.vert"};
+        const char* fragmentShader1Path {"shaders/shader1.frag"};
+        Shader shader1(vertexShader1Path, fragmentShader1Path);
+
+        const char* vertexShader2Path {"shaders/shader2.vert"};
+        const char* fragmentShader2Path {"shaders/shader2.frag"};
+        Shader shader2(vertexShader2Path, fragmentShader2Path);
 
         // square setup
         VertexBuffer vb1 {positions, sizeof(positions)};
@@ -83,7 +87,15 @@ int main()
             // draw triangle
             shader2.Bind();
             shader2.SetUniform1f("u_time_s", glfwGetTime());
+            shader2.SetUniform1f("u_x_offset", 0.2);
             renderer.Draw(va2, shader2, 3);
+
+            // hot reload shaders
+            if (window.WasKeyPressed(GLFW_KEY_R))
+            {
+                shader1.Reload(vertexShader1Path, fragmentShader1Path);
+                shader2.Reload(vertexShader2Path, fragmentShader2Path);
+            }
 
             // swap buffers and handle input
             window.ProcessInput();

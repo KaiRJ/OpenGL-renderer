@@ -9,12 +9,13 @@ class Window
   public:
     Window();
 
-    bool ShouldClose();
-    void ProcessInput();
-    void SwapBuffers();
+    bool WasKeyPressed(int key) const;
+    void ProcessInput() const;
+    bool ShouldClose() const;
+    void SwapBuffers() const;
 
   private:
-    GLFWwindow* window {nullptr};
+    GLFWwindow* m_window {nullptr};
 
     void CreateWindow();
 };

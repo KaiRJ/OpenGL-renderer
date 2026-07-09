@@ -14,6 +14,8 @@ class Shader
     void Bind() const;
     void Unbind() const;
 
+    void Reload(const char* vertexPath, const char* fragmentPath);
+
     // Set uniforms
     void SetUniform1f(const std::string& name, float value);
 
