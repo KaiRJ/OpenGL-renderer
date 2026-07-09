@@ -4,17 +4,20 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <string_view>
 
 std::string parseShader(std::string_view path);
 unsigned int createShader(unsigned int type, const char* source);
-unsigned int createShaderProgram(const char* vertexPath, const char* fragmentPath);
+unsigned int createShaderProgram(std::string_view vertexPath,
+                                 std::string_view fragmentPath);
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+Shader::Shader(std::string vertexPath, std::string fragmentPath)
+    : m_vertexPath {vertexPath}, m_fragmentPath {fragmentPath}
 {
-    m_shaderID = createShaderProgram(vertexPath, fragmentPath);
+    m_shaderID = createShaderProgram(m_vertexPath, m_fragmentPath);
 }
 
-Shader::~Shader() {}
+Shader::~Shader() { glDeleteProgram(m_shaderID); }
 
 void Shader::Bind() const { glUseProgram(m_shaderID); };
 
@@ -34,9 +37,9 @@ int Shader::GetUniformLocation(const std::string& name)
     return location;
 }
 
-void Shader::Reload(const char* vertexPath, const char* fragmentPath)
+void Shader::Reload()
 {
-    unsigned int new_programID {createShaderProgram(vertexPath, fragmentPath)};
+    unsigned int new_programID {createShaderProgram(m_vertexPath, m_fragmentPath)};
 
     if (new_programID)
     {
@@ -93,7 +96,8 @@ unsigned int createShader(unsigned int type, const char* source)
 }
 
 // link vertex and fragment shaders into a program
-unsigned int createShaderProgram(const char* vertexPath, const char* fragmentPath)
+unsigned int createShaderProgram(std::string_view vertexPath,
+                                 std::string_view fragmentPath)
 {
     // build and compile the shaders
     std::string vertexSource {parseShader(vertexPath)};

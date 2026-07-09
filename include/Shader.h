@@ -8,19 +8,22 @@
 class Shader
 {
   public:
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader(std::string vertexPath, std::string fragmentPath);
     ~Shader();
 
     void Bind() const;
     void Unbind() const;
 
-    void Reload(const char* vertexPath, const char* fragmentPath);
+    void Reload();
 
     // Set uniforms
     void SetUniform1f(const std::string& name, float value);
 
   private:
     unsigned int m_shaderID {};
+
+    std::string m_vertexPath {};
+    std::string m_fragmentPath {};
     std::unordered_map<std::string, int> m_uniformLocationCache {};
 
     int GetUniformLocation(const std::string& name);

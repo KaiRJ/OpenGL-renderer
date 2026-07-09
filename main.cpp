@@ -42,13 +42,8 @@ int main()
 
     { // ensure objects are destroyed before glfwTerminate()
         // shader programs setup
-        const char* vertexShader1Path {"shaders/shader1.vert"};
-        const char* fragmentShader1Path {"shaders/shader1.frag"};
-        Shader shader1(vertexShader1Path, fragmentShader1Path);
-
-        const char* vertexShader2Path {"shaders/shader2.vert"};
-        const char* fragmentShader2Path {"shaders/shader2.frag"};
-        Shader shader2(vertexShader2Path, fragmentShader2Path);
+        Shader shader1("shaders/shader1.vert", "shaders/shader1.frag");
+        Shader shader2("shaders/shader2.vert", "shaders/shader2.frag");
 
         // square setup
         VertexBuffer vb1 {positions, sizeof(positions)};
@@ -93,8 +88,8 @@ int main()
             // hot reload shaders
             if (window.WasKeyPressed(GLFW_KEY_R))
             {
-                shader1.Reload(vertexShader1Path, fragmentShader1Path);
-                shader2.Reload(vertexShader2Path, fragmentShader2Path);
+                shader1.Reload();
+                shader2.Reload();
             }
 
             // swap buffers and handle input
