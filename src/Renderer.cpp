@@ -1,5 +1,5 @@
-#include "Renderer.h"
-#include "IndexBuffer.h"
+#include "Renderer.hpp"
+#include "IndexBuffer.hpp"
 
 Renderer::Renderer() {}
 

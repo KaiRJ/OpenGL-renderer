@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "Window.hpp"
 
 #include <glad/glad.h>
 #include <stdexcept>
@@ -43,7 +43,6 @@ bool Window::ShouldClose() const { return glfwWindowShouldClose(m_window); }
 void Window::SwapBuffers() const { glfwSwapBuffers(m_window); }
 
 // initialize and configure glfw
-// -----------------------------
 static void initialise_glfw()
 {
     if (!glfwInit())
@@ -59,7 +58,6 @@ static void initialise_glfw()
 }
 
 // load all OpenGL function pointers from glad
-// -------------------------------------------
 static void load_opengl_pointers()
 {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -69,7 +67,6 @@ static void load_opengl_pointers()
 }
 
 // whenever the window size changed this callback function executes
-// ----------------------------------------------------------------
 static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);

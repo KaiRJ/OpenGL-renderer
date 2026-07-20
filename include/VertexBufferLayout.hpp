@@ -6,9 +6,9 @@
 
 struct VertexBufferElement
 {
-    unsigned int type;
-    unsigned int count;
-    unsigned int normalised;
+    unsigned int type {};
+    unsigned int count {};
+    unsigned int normalised {};
 };
 
 class VertexBufferLayout

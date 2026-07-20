@@ -1,9 +1,7 @@
-#include "Debug.h"
+#include "Debug.hpp"
 
 #include <iostream>
 
-// initialise debug output
-// -----------------------
 void initialiseDebugOutput()
 {
     int flags;
@@ -19,7 +17,6 @@ void initialiseDebugOutput()
 }
 
 // Helper function for printing OpenGL errors
-// ------------------------------------------
 void APIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id, GLenum severity,
                             GLsizei length, const char* message, const void* userParam)
 {

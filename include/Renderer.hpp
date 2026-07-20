@@ -1,9 +1,9 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "IndexBuffer.h"
-#include "Shader.h"
-#include "VertexArray.h"
+#include "IndexBuffer.hpp"
+#include "Shader.hpp"
+#include "VertexArray.hpp"
 
 class Renderer
 {

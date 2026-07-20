@@ -1,39 +1,17 @@
-#include "Debug.h"
-#include "IndexBuffer.h"
-#include "Renderer.h"
-#include "Shader.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
-#include "Window.h"
+#include "Debug.hpp"
+#include "IndexBuffer.hpp"
+#include "Renderer.hpp"
+#include "Shader.hpp"
+#include "VertexArray.hpp"
+#include "VertexBuffer.hpp"
+#include "VertexBufferLayout.hpp"
+#include "Window.hpp"
 
 #include <glad/glad.h>
 
+#include <array>
 #include <cassert>
 #include <cmath>
-
-namespace
-{
-    constexpr float positions[] = {
-        -0.9f, -0.5f, 0.0f, // bottom left
-        -0.0f, -0.5f, 0.0f, // bottom right
-        -0.9f, 0.5f,  0.0f, // top left
-        -0.0f, 0.5f,  0.0f, // top right
-    };
-
-    constexpr unsigned int indices[] = {
-        0, 1, 3, // lower half
-        0, 2, 3  // upper second
-    };
-
-    constexpr float positionsAndColours[] = {
-        // position                     // colour
-        0.0f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
-        0.9f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
-        0.45f, 0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
-    };
-
-} // namespace
 
 int main()
 {
@@ -46,8 +24,19 @@ int main()
         Shader shader2("shaders/shader2.vert", "shaders/shader2.frag");
 
         // square setup
-        VertexBuffer vb1 {positions, sizeof(positions)};
-        IndexBuffer ib {indices, 6};
+        constexpr std::array positions {
+            -0.9f, -0.5f, 0.0f, // bottom left
+            -0.0f, -0.5f, 0.0f, // bottom right
+            -0.9f, 0.5f,  0.0f, // top left
+            -0.0f, 0.5f,  0.0f, // top right
+        };
+        VertexBuffer vb1 {positions};
+
+        constexpr std::array indices {
+            0u, 1u, 3u, // lower half
+            0u, 2u, 3u  // upper second
+        };
+        IndexBuffer ib {indices};
 
         VertexBufferLayout layout1 {};
         layout1.Push<float>(3);
@@ -56,7 +45,13 @@ int main()
         va1.AddBuffer(vb1, layout1);
 
         // triangle setup
-        VertexBuffer vb2 {positionsAndColours, sizeof(positionsAndColours)};
+        constexpr std::array positionsAndColours {
+            // position                     // colour
+            0.0f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
+            0.9f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
+            0.45f, 0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
+        };
+        VertexBuffer vb2 {positionsAndColours};
 
         VertexBufferLayout layout2 {};
         layout2.Push<float>(3);
