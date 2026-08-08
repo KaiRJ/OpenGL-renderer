@@ -18,6 +18,7 @@ class Shader
 
     // Set uniforms
     void SetUniform1f(const std::string& name, float value);
+    void SetUniform1i(const std::string& name, int value);
 
   private:
     unsigned int m_shaderID {};

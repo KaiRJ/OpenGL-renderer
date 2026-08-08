@@ -54,6 +54,12 @@ void Shader::SetUniform1f(const std::string& name, float value)
     glUniform1f(location, value);
 }
 
+void Shader::SetUniform1i(const std::string& name, int value)
+{
+    int location {GetUniformLocation(name)};
+    glUniform1i(location, value);
+}
+
 // read shader code from file
 std::string parseShader(std::string_view path)
 {
