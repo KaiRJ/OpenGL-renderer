@@ -8,10 +8,10 @@
 class Texture
 {
   public:
-    Texture(std::string_view texturePath, int internalFormat = GL_RGB);
-    ~Texture() = default;
+    Texture(std::string_view path, int format = GL_RGB);
+    ~Texture();
 
-    void Bind(int glTextureID);
+    void Bind(int slot = 0);
 
   private:
     unsigned int m_textureID {};

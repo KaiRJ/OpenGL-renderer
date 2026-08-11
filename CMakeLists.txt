@@ -1,15 +1,16 @@
+cmake_minimum_required(VERSION 3.16...3.27)
+
+project(LearnOpenGL)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
-
-cmake_minimum_required(VERSION 3.16...3.27)
-project(LearnOpenGL)
 
 # Find GLFW using pkg-config
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 
 # Source files
-file(GLOB SOURCES src/* Libraries/glad/glad.c)
+file(GLOB SOURCES src/* Libraries/glad/glad.c Libraries/stb_image/stb_image.c)
 
 # Create executable
 add_executable(main main.cpp ${SOURCES})

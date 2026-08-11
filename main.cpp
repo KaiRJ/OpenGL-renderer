@@ -13,7 +13,6 @@
 #include <array>
 #include <cassert>
 #include <cmath>
-#include <iostream>
 
 int main()
 {
@@ -55,8 +54,8 @@ int main()
         shader1.Bind();
         shader1.SetUniform1i("u_texture1", 0);
         shader1.SetUniform1i("u_texture2", 1);
-        texture0.Bind(GL_TEXTURE0);
-        texture1.Bind(GL_TEXTURE1);
+        texture0.Bind(0);
+        texture1.Bind(1);
 
         // triangle setup
         constexpr std::array vertices {
