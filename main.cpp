@@ -1,5 +1,5 @@
+#include "Cube.hpp"
 #include "Debug.hpp"
-#include "IndexBuffer.hpp"
 #include "Renderer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -26,7 +26,7 @@ int main()
                                "shaders/triangle_shader.frag");
 
         constexpr float triangle_size {0.2};
-        constexpr std::array vertices {
+        constexpr std::array triangle_vertices {
             -triangle_size, -triangle_size, 0.0f, // left position
             1.0f,           0.0f,           0.0f, // left colour
             triangle_size,  -triangle_size, 0.0f, // right position
@@ -34,7 +34,7 @@ int main()
             0.0f,           triangle_size,  0.0f, // top position
             0.0f,           0.0f,           1.0f  // top colour
         };
-        VertexBuffer triangle_vb {vertices};
+        VertexBuffer triangle_vb {triangle_vertices};
 
         VertexBufferLayout triangle_layout {};
         triangle_layout.Push<float>(3);
@@ -44,51 +44,49 @@ int main()
         triangle_va.AddBuffer(triangle_vb, triangle_layout);
 
         // square setup
-        Shader shader1("shaders/shader1.vert", "shaders/shader1.frag");
+        Shader cube_shader("shaders/cube_shader.vert", "shaders/cube_shader.frag");
 
-        constexpr float size {0.4};
-        constexpr std::array positions {
-            // positions                    // texture coords
-            -size, -size, 0.0f, 0.0f, 0.0f, // bottom left
-            size,  -size, 0.0f, 2.0f, 0.0f, // bottom right
-            -size, size,  0.0f, 0.0f, 2.0f, // top left
-            size,  size,  0.0f, 2.0f, 2.0f  // top right
-        };
-        VertexBuffer vb1 {positions};
+        std::array cube_vertices {Cube::GetVertices(0.5)};
+        VertexBuffer cube_vb {cube_vertices};
 
-        constexpr std::array indices {
-            0u, 1u, 3u, // lower half
-            0u, 2u, 3u  // upper second
-        };
-        IndexBuffer ib {indices};
+        VertexBufferLayout cube_layout {};
+        cube_layout.Push<float>(3);
+        cube_layout.Push<float>(2);
 
-        VertexBufferLayout layout1 {};
-        layout1.Push<float>(3);
-        layout1.Push<float>(2);
-
-        VertexArray va1 {};
-        va1.AddBuffer(vb1, layout1);
+        VertexArray cube_va {};
+        cube_va.AddBuffer(cube_vb, cube_layout);
 
         // order of code is important as calls to glbindTexure will bind that texture to
         // the currently active texture unit.
         Texture texture0 {"../textures/container.jpg", GL_RGB};
         Texture texture1 {"../textures/awesomeface.png", GL_RGBA};
-        shader1.Bind();
-        shader1.SetUniform1i("u_texture1", 0);
-        shader1.SetUniform1i("u_texture2", 1);
+        cube_shader.SetUniform1i("u_texture1", 0);
+        cube_shader.SetUniform1i("u_texture2", 1);
         texture0.Bind(0);
         texture1.Bind(1);
 
-        // Renderer object for drawing
-        Renderer renderer {};
-
-        // Matrices for square projection
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        // matrices for cube projection
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        glm::mat4 projection {
+            glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)};
+
+        // positions for all cubes
+        constexpr glm::vec3 cube_positions[] = {
+            glm::vec3(0.0f, 0.0f, 0.0f),     //
+            glm::vec3(2.0f, 5.0f, -15.0f),   //
+            glm::vec3(-1.5f, -2.2f, -2.5f),  //
+            glm::vec3(-3.8f, -2.0f, -12.3f), //
+            glm::vec3(2.4f, -0.4f, -3.5f),   //
+            glm::vec3(-1.7f, 3.0f, -7.5f),   //
+            glm::vec3(1.3f, -2.0f, -2.5f),   //
+            glm::vec3(1.5f, 2.0f, -2.5f),    //
+            glm::vec3(1.5f, 0.2f, -1.5f),    //
+            glm::vec3(-1.3f, 1.0f, -1.5f)    //
+        };
+
+        // Renderer object for drawing
+        Renderer renderer {};
 
         // render loop
         while (!window.ShouldClose())
@@ -105,17 +103,27 @@ int main()
             triangle_shader.SetUniformMatrix4fv("u_transform", trans);
             renderer.Draw(triangle_va, triangle_shader, 3);
 
-            // draw square
-            shader1.Bind();
-            shader1.SetUniformMatrix4fv("u_model", model);
-            shader1.SetUniformMatrix4fv("u_view", view);
-            shader1.SetUniformMatrix4fv("u_projection", projection);
-            renderer.Draw(va1, shader1, ib);
+            // apply matrices for square projection
+            cube_shader.SetUniformMatrix4fv("u_view", view);
+            cube_shader.SetUniformMatrix4fv("u_projection", projection);
+
+            // draw squares
+            for (unsigned int i = 0; i < 10; i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, cube_positions[i]);
+                float angle = 20.0f * i;
+                model =
+                    glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                cube_shader.SetUniformMatrix4fv("u_model", model);
+
+                renderer.Draw(cube_va, cube_shader, 36);
+            }
 
             // hot reload shaders
             if (window.WasKeyPressed(GLFW_KEY_R))
             {
-                shader1.Reload();
+                cube_shader.Reload();
                 triangle_shader.Reload();
             }
 

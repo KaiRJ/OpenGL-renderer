@@ -52,18 +52,21 @@ void Shader::Reload()
 
 void Shader::SetUniform1f(const std::string& name, float value)
 {
+    Bind();
     int location {GetUniformLocation(name)};
     glUniform1f(location, value);
 }
 
 void Shader::SetUniform1i(const std::string& name, int value)
 {
+    Bind();
     int location {GetUniformLocation(name)};
     glUniform1i(location, value);
 }
 
 void Shader::SetUniformMatrix4fv(const std::string& name, glm::mat4 value)
 {
+    Bind();
     int location = GetUniformLocation(name);
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }

@@ -1,14 +1,12 @@
 #include "Renderer.hpp"
 #include "IndexBuffer.hpp"
 
-Renderer::Renderer() {}
-
-Renderer::~Renderer() {}
+Renderer::Renderer() { glEnable(GL_DEPTH_TEST); }
 
 void Renderer::Clear(float r, float g, float b, float a) const
 {
     glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Renderer::Draw(const VertexArray& va, const Shader& s, int count) const
