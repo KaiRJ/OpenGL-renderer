@@ -9,6 +9,7 @@
 #include "Window.hpp"
 
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <array>
 #include <cassert>
@@ -20,17 +21,38 @@ int main()
     initialiseDebugOutput();
 
     { // ensure objects are destroyed before glfwTerminate()
-        // shader programs setup
-        Shader shader1("shaders/shader1.vert", "shaders/shader1.frag");
-        Shader shader2("shaders/shader2.vert", "shaders/shader2.frag");
+        // triangle setup
+        Shader triangle_shader("shaders/triangle_shader.vert",
+                               "shaders/triangle_shader.frag");
+
+        constexpr float triangle_size {0.2};
+        constexpr std::array vertices {
+            -triangle_size, -triangle_size, 0.0f, // left position
+            1.0f,           0.0f,           0.0f, // left colour
+            triangle_size,  -triangle_size, 0.0f, // right position
+            0.0f,           1.0f,           0.0f, // right position
+            0.0f,           triangle_size,  0.0f, // top position
+            0.0f,           0.0f,           1.0f  // top colour
+        };
+        VertexBuffer triangle_vb {vertices};
+
+        VertexBufferLayout triangle_layout {};
+        triangle_layout.Push<float>(3);
+        triangle_layout.Push<float>(3);
+
+        VertexArray triangle_va {};
+        triangle_va.AddBuffer(triangle_vb, triangle_layout);
 
         // square setup
+        Shader shader1("shaders/shader1.vert", "shaders/shader1.frag");
+
+        constexpr float size {0.4};
         constexpr std::array positions {
             // positions                    // texture coords
-            -0.9f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-            -0.0f, -0.5f, 0.0f, 2.0f, 0.0f, // bottom right
-            -0.9f, 0.5f,  0.0f, 0.0f, 2.0f, // top left
-            -0.0f, 0.5f,  0.0f, 2.0f, 2.0f  // top right
+            -size, -size, 0.0f, 0.0f, 0.0f, // bottom left
+            size,  -size, 0.0f, 2.0f, 0.0f, // bottom right
+            -size, size,  0.0f, 0.0f, 2.0f, // top left
+            size,  size,  0.0f, 2.0f, 2.0f  // top right
         };
         VertexBuffer vb1 {positions};
 
@@ -57,46 +79,44 @@ int main()
         texture0.Bind(0);
         texture1.Bind(1);
 
-        // triangle setup
-        constexpr std::array vertices {
-            // position                     // colour
-            0.0f,  -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, // left
-            0.9f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // right
-            0.45f, 0.5f,  0.0f, 0.0f, 0.0f, 1.0f  // top
-        };
-        VertexBuffer vb2 {vertices};
-
-        VertexBufferLayout layout2 {};
-        layout2.Push<float>(3);
-        layout2.Push<float>(3);
-
-        VertexArray va2 {};
-        va2.AddBuffer(vb2, layout2);
-
         // Renderer object for drawing
         Renderer renderer {};
+
+        // Matrices for square projection
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
         // render loop
         while (!window.ShouldClose())
         {
             renderer.Clear();
 
-            // draw square
-            shader1.Bind();
-            shader1.SetUniform1f("u_time_s", glfwGetTime());
-            renderer.Draw(va1, shader1, ib);
+            float time_s {static_cast<float>(glfwGetTime())};
 
             // draw triangle
-            shader2.Bind();
-            shader2.SetUniform1f("u_time_s", glfwGetTime());
-            shader2.SetUniform1f("u_x_offset", 0.2);
-            renderer.Draw(va2, shader2, 3);
+            triangle_shader.Bind();
+            glm::mat4 trans {glm::mat4(1.0f)};
+            glm::vec3 offset {glm::vec3(0.5f, sin(time_s), 0.0f)};
+            trans = glm::translate(trans, offset);
+            triangle_shader.SetUniformMatrix4fv("u_transform", trans);
+            renderer.Draw(triangle_va, triangle_shader, 3);
+
+            // draw square
+            shader1.Bind();
+            shader1.SetUniformMatrix4fv("u_model", model);
+            shader1.SetUniformMatrix4fv("u_view", view);
+            shader1.SetUniformMatrix4fv("u_projection", projection);
+            renderer.Draw(va1, shader1, ib);
 
             // hot reload shaders
             if (window.WasKeyPressed(GLFW_KEY_R))
             {
                 shader1.Reload();
-                shader2.Reload();
+                triangle_shader.Reload();
             }
 
             // swap buffers and handle input

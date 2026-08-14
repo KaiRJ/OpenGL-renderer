@@ -6,6 +6,8 @@
 #include <sstream>
 #include <string_view>
 
+#include <glm/gtc/type_ptr.hpp>
+
 std::string parseShader(std::string_view path);
 unsigned int createShader(unsigned int type, const char* source);
 unsigned int createShaderProgram(std::string_view vertexPath,
@@ -58,6 +60,12 @@ void Shader::SetUniform1i(const std::string& name, int value)
 {
     int location {GetUniformLocation(name)};
     glUniform1i(location, value);
+}
+
+void Shader::SetUniformMatrix4fv(const std::string& name, glm::mat4 value)
+{
+    int location = GetUniformLocation(name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 // read shader code from file

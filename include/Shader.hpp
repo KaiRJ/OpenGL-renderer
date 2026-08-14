@@ -2,6 +2,8 @@
 #define SHADER_H
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+
 #include <string>
 #include <unordered_map>
 
@@ -19,6 +21,7 @@ class Shader
     // Set uniforms
     void SetUniform1f(const std::string& name, float value);
     void SetUniform1i(const std::string& name, int value);
+    void SetUniformMatrix4fv(const std::string& name, glm::mat4 value);
 
   private:
     unsigned int m_shaderID {};
