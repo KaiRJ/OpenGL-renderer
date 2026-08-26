@@ -3,6 +3,7 @@
 #include "Renderer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
+#include "Triangle.hpp"
 #include "VertexArray.hpp"
 #include "VertexBuffer.hpp"
 #include "VertexBufferLayout.hpp"
@@ -22,39 +23,12 @@ int main()
 
     { // ensure objects are destroyed before glfwTerminate()
         // triangle setup
-        Shader triangle_shader("shaders/triangle_shader.vert",
-                               "shaders/triangle_shader.frag");
-
-        constexpr float triangle_size {0.2};
-        constexpr std::array triangle_vertices {
-            -triangle_size, -triangle_size, 0.0f, // left position
-            1.0f,           0.0f,           0.0f, // left colour
-            triangle_size,  -triangle_size, 0.0f, // right position
-            0.0f,           1.0f,           0.0f, // right position
-            0.0f,           triangle_size,  0.0f, // top position
-            0.0f,           0.0f,           1.0f  // top colour
-        };
-        VertexBuffer triangle_vb {triangle_vertices};
-
-        VertexBufferLayout triangle_layout {};
-        triangle_layout.Push<float>(3);
-        triangle_layout.Push<float>(3);
-
-        VertexArray triangle_va {};
-        triangle_va.AddBuffer(triangle_vb, triangle_layout);
+        Triangle triangle {};
+        Shader triangle_shader("shaders/triangle.vert", "shaders/triangle.frag");
 
         // square setup
-        Shader cube_shader("shaders/cube_shader.vert", "shaders/cube_shader.frag");
-
-        std::array cube_vertices {Cube::GetVertices(0.5)};
-        VertexBuffer cube_vb {cube_vertices};
-
-        VertexBufferLayout cube_layout {};
-        cube_layout.Push<float>(3);
-        cube_layout.Push<float>(2);
-
-        VertexArray cube_va {};
-        cube_va.AddBuffer(cube_vb, cube_layout);
+        Cube cube {};
+        Shader cube_shader("shaders/cube.vert", "shaders/cube.frag");
 
         // order of code is important as calls to glbindTexure will bind that texture to
         // the currently active texture unit.
@@ -67,7 +41,7 @@ int main()
 
         // matrices for cube projection
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
         glm::mat4 projection {
             glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)};
 
@@ -100,8 +74,9 @@ int main()
             glm::mat4 trans {glm::mat4(1.0f)};
             glm::vec3 offset {glm::vec3(0.5f, sin(time_s), 0.0f)};
             trans = glm::translate(trans, offset);
+            trans = glm::scale(trans, glm::vec3(0.4, 0.4, 0.4));
             triangle_shader.SetUniformMatrix4fv("u_transform", trans);
-            renderer.Draw(triangle_va, triangle_shader, 3);
+            renderer.Draw(triangle.GetVertexArray(), triangle_shader, 3);
 
             // apply matrices for square projection
             cube_shader.SetUniformMatrix4fv("u_view", view);
@@ -112,12 +87,11 @@ int main()
             {
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, cube_positions[i]);
-                float angle = 20.0f * i;
-                model =
-                    glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+                model = glm::rotate(model, glm::radians(20.0f * i),
+                                    glm::vec3(1.0f, 0.3f, 0.5f));
                 cube_shader.SetUniformMatrix4fv("u_model", model);
 
-                renderer.Draw(cube_va, cube_shader, 36);
+                renderer.Draw(cube.GetVertexArray(), cube_shader, 36);
             }
 
             // hot reload shaders

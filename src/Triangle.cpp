@@ -1,10 +1,10 @@
-#include "Cube.hpp"
+#include "Triangle.hpp"
 
-Cube::Cube()
+Triangle::Triangle()
 {
     m_vertexBuffer.AddData(m_vertices);
     m_vertexBufferLayout.Push<float>(3);
-    m_vertexBufferLayout.Push<float>(2);
+    m_vertexBufferLayout.Push<float>(3);
 
     m_vertexArray.AddBuffer(m_vertexBuffer, m_vertexBufferLayout);
 }

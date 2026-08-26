@@ -8,20 +8,21 @@
 class VertexBuffer
 {
   public:
-    template <typename T, std::size_t N>
-    VertexBuffer(std::array<T, N> data);
-
+    VertexBuffer() = default;
     ~VertexBuffer();
 
     void Bind() const;
     void Unbind() const;
+
+    template <typename T, std::size_t N>
+    void AddData(std::array<T, N> data);
 
   private:
     unsigned int m_bufferID;
 };
 
 template <typename T, std::size_t N>
-VertexBuffer::VertexBuffer(std::array<T, N> data)
+void VertexBuffer::AddData(std::array<T, N> data)
 {
     glGenBuffers(1, &m_bufferID);
     glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
