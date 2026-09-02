@@ -1,49 +1,29 @@
 #include "Cube.hpp"
-#include "Debug.hpp"
 #include "Renderer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
-#include "Triangle.hpp"
-#include "VertexArray.hpp"
 #include "VertexBuffer.hpp"
-#include "VertexBufferLayout.hpp"
 #include "Window.hpp"
 
-#include <glad/glad.h>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <array>
 #include <cassert>
-#include <cmath>
+#include <glm/gtc/matrix_transform.hpp>
 
 int main()
 {
     Window window {};
-    initialiseDebugOutput();
+    Renderer renderer {};
 
     { // ensure objects are destroyed before glfwTerminate()
-        // triangle setup
-        Triangle triangle {};
-        Shader triangle_shader("shaders/triangle.vert", "shaders/triangle.frag");
-
-        // square setup
         Cube cube {};
         Shader cube_shader("shaders/cube.vert", "shaders/cube.frag");
 
-        // order of code is important as calls to glbindTexure will bind that texture to
-        // the currently active texture unit.
-        Texture texture0 {"../textures/container.jpg", GL_RGB};
-        Texture texture1 {"../textures/awesomeface.png", GL_RGBA};
-        cube_shader.SetUniform1i("u_texture1", 0);
-        cube_shader.SetUniform1i("u_texture2", 1);
-        texture0.Bind(0);
-        texture1.Bind(1);
-
-        // matrices for cube projection
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
-        glm::mat4 projection {
-            glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f)};
+        // when i create new texture it get automatically binds to first slot
+        Texture container_texture {"../textures/container.jpg", GL_RGB};
+        Texture face_texture {"../textures/awesomeface.png", GL_RGBA};
+        container_texture.Bind(0);
+        face_texture.Bind(1);
+        cube_shader.SetUniform1i("u_texture0", 0);
+        cube_shader.SetUniform1i("u_texture1", 1);
 
         // positions for all cubes
         constexpr glm::vec3 cube_positions[] = {
@@ -59,51 +39,48 @@ int main()
             glm::vec3(-1.3f, 1.0f, -1.5f)    //
         };
 
-        // Renderer object for drawing
-        Renderer renderer {};
-
         // render loop
-        while (!window.ShouldClose())
+        float delta_time {0.0}; // time between current frame and last frame
+        float last_frame {0.0}; // time of last frame
+        while (!window.shouldClose())
         {
-            renderer.Clear();
+            float current_frame {static_cast<float>(glfwGetTime())};
+            delta_time = current_frame - last_frame;
+            last_frame = current_frame;
 
-            float time_s {static_cast<float>(glfwGetTime())};
+            window.processInput(delta_time);
+            renderer.clear();
 
-            // draw triangle
-            triangle_shader.Bind();
-            glm::mat4 trans {glm::mat4(1.0f)};
-            glm::vec3 offset {glm::vec3(0.5f, sin(time_s), 0.0f)};
-            trans = glm::translate(trans, offset);
-            trans = glm::scale(trans, glm::vec3(0.4, 0.4, 0.4));
-            triangle_shader.SetUniformMatrix4fv("u_transform", trans);
-            renderer.Draw(triangle.GetVertexArray(), triangle_shader, 3);
-
-            // apply matrices for square projection
+            glm::mat4 view {window.getViewMatrix()};
             cube_shader.SetUniformMatrix4fv("u_view", view);
+
+            glm::mat4 projection {window.getProjectionMatrix()};
             cube_shader.SetUniformMatrix4fv("u_projection", projection);
 
             // draw squares
             for (unsigned int i = 0; i < 10; i++)
             {
+                float deg {glm::radians(20.0f * i)};
+                if (i % 3 == 0)
+                    deg = glm::radians(30.0f * current_frame);
+
                 glm::mat4 model = glm::mat4(1.0f);
                 model = glm::translate(model, cube_positions[i]);
-                model = glm::rotate(model, glm::radians(20.0f * i),
-                                    glm::vec3(1.0f, 0.3f, 0.5f));
+                model = glm::rotate(model, deg, glm::vec3(1.0f, 0.3f, 0.5f));
+                model = glm::scale(model, glm::vec3(0.8, 0.8, 0.8));
                 cube_shader.SetUniformMatrix4fv("u_model", model);
-
-                renderer.Draw(cube.GetVertexArray(), cube_shader, 36);
+                renderer.draw(cube.getVertexArray(), cube_shader, 36);
             }
 
             // hot reload shaders
-            if (window.WasKeyPressed(GLFW_KEY_R))
+            // TODO need to track all objects in game and call reload, a shader vector
+            // that is passed to window?
+            if (window.wasKeyPressed(GLFW_KEY_R))
             {
                 cube_shader.Reload();
-                triangle_shader.Reload();
             }
 
-            // swap buffers and handle input
-            window.ProcessInput();
-            window.SwapBuffers();
+            window.swapBuffers();
             glfwPollEvents();
         }
     }

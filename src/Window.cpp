@@ -1,49 +1,79 @@
 #include "Window.hpp"
+#include "Camera.hpp"
 
 #include <glad/glad.h>
 #include <stdexcept>
 
-static void initialise_glfw();
-static void load_opengl_pointers();
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+static void initialiseGlfw();
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos);
+static void scrollCallback(GLFWwindow* window, double x_offset, double y_offset);
 
 Window::Window()
 {
-    initialise_glfw();
-    CreateWindow();
-    load_opengl_pointers();
+    initialiseGlfw();
+    createWindow();
 }
 
-void Window::CreateWindow()
+Window::~Window() { glfwDestroyWindow(window); }
+
+Camera& Window::getCamera() { return camera; }
+
+glm::mat4 Window::getViewMatrix() const { return camera.getViewMatrix(); };
+
+glm::mat4 Window::getProjectionMatrix() const
 {
-    m_window = glfwCreateWindow(800, 600, "LearnOpenGL", nullptr, nullptr);
-    if (m_window == nullptr)
+    float aspect {width / height};
+    return glm::perspective(glm::radians(camera.getZoom()), aspect, 0.1f, 100.0f);
+};
+
+void Window::createWindow()
+{
+    window = glfwCreateWindow(width, height, "OpenGL Renderer", nullptr, nullptr);
+    if (window == nullptr)
     {
         throw std::runtime_error("Failed to create GLFW window");
     }
-    glfwMakeContextCurrent(m_window);
-    glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
+
+    glfwMakeContextCurrent(window);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 }
 
-bool Window::WasKeyPressed(int key) const
+bool Window::wasKeyPressed(int key) const
 {
-    return glfwGetKey(m_window, key) == GLFW_PRESS;
+    return glfwGetKey(window, key) == GLFW_PRESS;
 }
 
-void Window::ProcessInput() const
+void Window::processInput(float delta_time)
 {
-    if (WasKeyPressed(GLFW_KEY_ESCAPE))
+    if (wasKeyPressed(GLFW_KEY_W))
+        camera.handleKeyboard(Camera::forward, delta_time);
+
+    if (wasKeyPressed(GLFW_KEY_S))
+        camera.handleKeyboard(Camera::backward, delta_time);
+
+    if (wasKeyPressed(GLFW_KEY_A))
+        camera.handleKeyboard(Camera::leftward, delta_time);
+
+    if (wasKeyPressed(GLFW_KEY_D))
+        camera.handleKeyboard(Camera::rightward, delta_time);
+
+    if (wasKeyPressed(GLFW_KEY_ESCAPE))
     {
-        glfwSetWindowShouldClose(m_window, true);
+        glfwSetWindowShouldClose(window, true);
     }
 }
 
-bool Window::ShouldClose() const { return glfwWindowShouldClose(m_window); }
+bool Window::shouldClose() const { return glfwWindowShouldClose(window); }
 
-void Window::SwapBuffers() const { glfwSwapBuffers(m_window); }
+void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
-// initialize and configure glfw
-static void initialise_glfw()
+static void initialiseGlfw()
 {
     if (!glfwInit())
     {
@@ -57,17 +87,19 @@ static void initialise_glfw()
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true); // slow!
 }
 
-// load all OpenGL function pointers from glad
-static void load_opengl_pointers()
-{
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        throw std::runtime_error("Failed to initialize GLAD");
-    }
-}
-
-// whenever the window size changed this callback function executes
-static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos)
+{
+    auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    self->getCamera().handleMouseCallback(x_pos, y_pos);
+}
+
+static void scrollCallback(GLFWwindow* window, double x_offset, double y_offset)
+{
+    auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    self->getCamera().handleScrollCallback(x_offset, y_offset);
 }

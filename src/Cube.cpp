@@ -2,9 +2,11 @@
 
 Cube::Cube()
 {
-    m_vertexBuffer.AddData(m_vertices);
-    m_vertexBufferLayout.Push<float>(3);
-    m_vertexBufferLayout.Push<float>(2);
+    vertexBuffer.AddData(vertices);
+    vertexBufferLayout.Push<float>(3);
+    vertexBufferLayout.Push<float>(2);
 
-    m_vertexArray.AddBuffer(m_vertexBuffer, m_vertexBufferLayout);
+    vertexArray.AddBuffer(vertexBuffer, vertexBufferLayout);
 }
+
+const VertexArray& Cube::getVertexArray() const { return vertexArray; };
