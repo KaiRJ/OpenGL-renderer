@@ -27,16 +27,16 @@ int main()
 
         // positions for all cubes
         constexpr glm::vec3 cube_positions[] = {
-            glm::vec3(0.0f, 0.0f, 0.0f),     //
-            glm::vec3(2.0f, 5.0f, -15.0f),   //
-            glm::vec3(-1.5f, -2.2f, -2.5f),  //
-            glm::vec3(-3.8f, -2.0f, -12.3f), //
-            glm::vec3(2.4f, -0.4f, -3.5f),   //
-            glm::vec3(-1.7f, 3.0f, -7.5f),   //
-            glm::vec3(1.3f, -2.0f, -2.5f),   //
-            glm::vec3(1.5f, 2.0f, -2.5f),    //
-            glm::vec3(1.5f, 0.2f, -1.5f),    //
-            glm::vec3(-1.3f, 1.0f, -1.5f)    //
+            glm::vec3(0.0F, 0.0F, 0.0F),     //
+            glm::vec3(2.0F, 5.0F, -15.0F),   //
+            glm::vec3(-1.5F, -2.2F, -2.5F),  //
+            glm::vec3(-3.8F, -2.0F, -12.3F), //
+            glm::vec3(2.4F, -0.4F, -3.5F),   //
+            glm::vec3(-1.7F, 3.0F, -7.5F),   //
+            glm::vec3(1.3F, -2.0F, -2.5F),   //
+            glm::vec3(1.5F, 2.0F, -2.5F),    //
+            glm::vec3(1.5F, 0.2F, -1.5F),    //
+            glm::vec3(-1.3F, 1.0F, -1.5F)    //
         };
 
         // render loop
@@ -58,15 +58,18 @@ int main()
             cube_shader.SetUniformMatrix4fv("u_projection", projection);
 
             // draw squares
-            for (unsigned int i = 0; i < 10; i++)
+            constexpr int num_squares {10};
+            for (unsigned int i = 0; i < num_squares; i++)
             {
-                float deg {glm::radians(20.0f * i)};
+                float deg {glm::radians(20.0F * static_cast<float>(i))};
                 if (i % 3 == 0)
-                    deg = glm::radians(30.0f * current_frame);
+                {
+                    deg = glm::radians(30.0F * current_frame);
+                }
 
-                glm::mat4 model = glm::mat4(1.0f);
+                glm::mat4 model {1.0F};
                 model = glm::translate(model, cube_positions[i]);
-                model = glm::rotate(model, deg, glm::vec3(1.0f, 0.3f, 0.5f));
+                model = glm::rotate(model, deg, glm::vec3(1.0F, 0.3F, 0.5F));
                 model = glm::scale(model, glm::vec3(0.8, 0.8, 0.8));
                 cube_shader.SetUniformMatrix4fv("u_model", model);
                 renderer.draw(cube.getVertexArray(), cube_shader, 36);
