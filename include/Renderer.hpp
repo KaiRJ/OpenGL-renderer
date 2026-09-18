@@ -5,15 +5,19 @@
 #include "Shader.hpp"
 #include "VertexArray.hpp"
 
-class Renderer
+namespace Renderer
 {
-  public:
-    Renderer();
-    ~Renderer() = default;
+    void initialise();
 
-    void clear(float r = 0.2f, float g = 0.3f, float b = 0.3f, float a = 1.0f) const;
-    void draw(const VertexArray& va, const Shader& s, int count) const;
-    void draw(const VertexArray& va, const Shader& s, const IndexBuffer& ib) const;
-};
+    void loadOpenglPointers();
+
+    void clear(float red, float green, float blue, float alpha);
+
+    void draw(const VertexArray& vertex_array, const Shader& shader, int count);
+
+    void draw(const VertexArray& vertex_array, const Shader& shader,
+              const IndexBuffer& index_buffer);
+
+}; // namespace Renderer
 
 #endif

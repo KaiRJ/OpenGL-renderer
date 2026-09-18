@@ -16,7 +16,7 @@ class IndexBuffer
     void Bind() const;
     void Unbind() const;
 
-    unsigned int GetCount() const;
+    [[nodiscard]] unsigned int GetCount() const;
 
   private:
     unsigned int m_bufferID;

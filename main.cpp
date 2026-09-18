@@ -11,7 +11,7 @@
 int main()
 {
     Window window {};
-    Renderer renderer {};
+    Renderer::initialise();
 
     { // ensure objects are destroyed before glfwTerminate()
         Cube cube {};
@@ -49,7 +49,7 @@ int main()
             last_frame = current_frame;
 
             window.processInput(delta_time);
-            renderer.clear();
+            Renderer::clear(0.2F, 0.3F, 0.3F, 1.0F);
 
             glm::mat4 view {window.getViewMatrix()};
             cube_shader.SetUniformMatrix4fv("u_view", view);
@@ -72,7 +72,7 @@ int main()
                 model = glm::rotate(model, deg, glm::vec3(1.0F, 0.3F, 0.5F));
                 model = glm::scale(model, glm::vec3(0.8, 0.8, 0.8));
                 cube_shader.SetUniformMatrix4fv("u_model", model);
-                renderer.draw(cube.getVertexArray(), cube_shader, 36);
+                Renderer::draw(cube.getVertexArray(), cube_shader, 36);
             }
 
             // hot reload shaders
