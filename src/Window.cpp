@@ -23,8 +23,8 @@ glm::mat4 Window::getViewMatrix() const { return camera.getViewMatrix(); };
 
 glm::mat4 Window::getProjectionMatrix() const
 {
-    float aspect {width / height};
-    return glm::perspective(glm::radians(camera.getZoom()), aspect, 0.1f, 100.0f);
+    float aspect {static_cast<float>(width) / static_cast<float>(height)};
+    return glm::perspective(glm::radians(camera.getZoom()), aspect, 0.1F, 100.0F);
 };
 
 void Window::createWindow()
@@ -52,16 +52,24 @@ bool Window::wasKeyPressed(int key) const
 void Window::processInput(float delta_time)
 {
     if (wasKeyPressed(GLFW_KEY_W))
+    {
         camera.handleKeyboard(Camera::forward, delta_time);
+    }
 
     if (wasKeyPressed(GLFW_KEY_S))
+    {
         camera.handleKeyboard(Camera::backward, delta_time);
+    }
 
     if (wasKeyPressed(GLFW_KEY_A))
+    {
         camera.handleKeyboard(Camera::leftward, delta_time);
+    }
 
     if (wasKeyPressed(GLFW_KEY_D))
+    {
         camera.handleKeyboard(Camera::rightward, delta_time);
+    }
 
     if (wasKeyPressed(GLFW_KEY_ESCAPE))
     {

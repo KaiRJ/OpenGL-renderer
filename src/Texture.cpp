@@ -1,5 +1,5 @@
 #include "Texture.hpp"
-#include "stb_image/stb_image.h"
+#include "stb_image.h"
 
 #include <iostream>
 
@@ -19,9 +19,11 @@ Texture::Texture(std::string_view path, int format)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // load texture
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load(path.data(), &width, &height, &nrChannels, 0);
-    if (data)
+    int width;
+    int height;
+    int n_channels;
+    unsigned char* data = stbi_load(path.data(), &width, &height, &n_channels, 0);
+    if (data != nullptr)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE,
                      data);
@@ -29,7 +31,7 @@ Texture::Texture(std::string_view path, int format)
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture" << "\n";
     }
 
     // free data as don't need it anymore

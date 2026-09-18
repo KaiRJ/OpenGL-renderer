@@ -1,5 +1,3 @@
-#define GLFW_INCLUDE_NONE
-
 #include "Renderer.hpp"
 #include "Debug.hpp"
 #include "IndexBuffer.hpp"

@@ -1,6 +1,5 @@
 #ifndef WINDOW_H
 #define WINDOW_H
-#define GLFW_INCLUDE_NONE
 
 #include "Camera.hpp"
 
@@ -25,10 +24,10 @@ class Window
     void createWindow();
 
     GLFWwindow* window {};
-    Camera camera {};
+    Camera camera;
 
-    const float width {800.0};
-    const float height {600.0};
+    const int width {800};
+    const int height {600};
 };
 
 #endif

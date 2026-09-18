@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include <algorithm>
 
 float Camera::getZoom() const { return zoom; }
 
@@ -29,11 +30,7 @@ void Camera::handleKeyboard(Direction direction, float delta_time)
 
 void Camera::handleScrollCallback(float x_offset, float y_offset)
 {
-    zoom -= y_offset;
-    if (zoom < 1.0f)
-        zoom = 1.0f;
-    if (zoom > 45.0f)
-        zoom = 45.0f;
+    zoom = std::clamp(zoom - y_offset, 1.0F, 45.0F);
 }
 
 void Camera::handleMouseCallback(float x_pos, float y_pos)
@@ -63,10 +60,7 @@ void Camera::processMouseMovement(float x_offset, float y_offset)
     yaw += x_offset;
     pitch += y_offset;
 
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
+    pitch = std::clamp(pitch, -89.0F, 89.0F);
 }
 
 void Camera::updateCameraVectors()
