@@ -16,35 +16,58 @@ add_subdirectory(Libraries/glfw)
 add_library(glad STATIC Libraries/glad/src/glad.c)
 target_include_directories(glad PUBLIC Libraries/glad/include/)
 
+# Libraries: imgui (has no CMakeLists.txt file so need to fetch outselves)
+add_library(imgui STATIC
+  Libraries/imgui/imgui.cpp
+  Libraries/imgui/imgui_draw.cpp
+  Libraries/imgui/imgui_tables.cpp
+  Libraries/imgui/imgui_widgets.cpp
+  Libraries/imgui/imgui_demo.cpp
+  Libraries/imgui/backends/imgui_impl_glfw.cpp
+  Libraries/imgui/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui PUBLIC
+  ${CMAKE_SOURCE_DIR}/Libraries/imgui
+  ${CMAKE_SOURCE_DIR}/Libraries/imgui/backends
+)
+
 # Create executable
 file(GLOB SOURCES main.cpp src/*)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   GLFW_INCLUDE_NONE
-  PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+  PROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
+)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   include
   Libraries/glm/
-  Libraries/stb/)
+  Libraries/stb/
+  Libraries/imgui/
+)
 
-add_compile_options(-ggdb
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  glfw
+  glad
+  imgui
+)
+
+add_compile_options(
+  -ggdb
   -pedantic-errors
   -Wall
   -Weffc++
   -Wextra
   -Wconversion
   -Wsign-conversion
-  -Werror)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  glfw
-  glad
+  -Werror
 )
 
 # Create shader directory in build folder
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(
+  TARGET ${PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory
   ${CMAKE_BINARY_DIR}/shaders
 )

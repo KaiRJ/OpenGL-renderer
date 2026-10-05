@@ -1,4 +1,5 @@
 #include "Cube.hpp"
+#include "Gui.hpp"
 #include "Renderer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
@@ -11,6 +12,7 @@
 int main()
 {
     Window window {};
+    Gui::initialise(window.getWindow());
     Renderer::initialise();
 
     { // ensure objects are destroyed before glfwTerminate()
@@ -48,6 +50,7 @@ int main()
             delta_time = current_frame - last_frame;
             last_frame = current_frame;
 
+            Gui::newFrame();
             window.processInput(delta_time);
             Renderer::clear(0.2F, 0.3F, 0.3F, 1.0F);
 
@@ -83,11 +86,13 @@ int main()
                 cube_shader.Reload();
             }
 
+            Gui::render();
             window.swapBuffers();
             glfwPollEvents();
         }
     }
 
+    Gui::shutdown();
     glfwTerminate();
     return 0;
 }

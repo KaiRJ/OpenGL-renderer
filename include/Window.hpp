@@ -11,13 +11,19 @@ class Window
     Window();
     ~Window();
 
-    Camera& getCamera();
-    glm::mat4 getViewMatrix() const;
-    glm::mat4 getProjectionMatrix() const;
+    // delete the copy constructor and assignment
+    Window(const Window& window) = delete;
+    Window& operator=(const Window& window) = delete;
 
-    bool wasKeyPressed(int key) const;
+    [[nodiscard]] GLFWwindow* getWindow();
+    [[nodiscard]] Camera& getCamera();
+    [[nodiscard]] glm::mat4 getViewMatrix() const;
+    [[nodiscard]] glm::mat4 getProjectionMatrix() const;
+
+    [[nodiscard]] bool wasKeyPressed(int key) const;
+    [[nodiscard]] bool shouldClose() const;
+
     void processInput(float delta_time);
-    bool shouldClose() const;
     void swapBuffers() const;
 
   private:
@@ -26,8 +32,13 @@ class Window
     GLFWwindow* window {};
     Camera camera;
 
-    const int width {800};
-    const int height {600};
+    static constexpr int width {800};
+    static constexpr int height {600};
 };
+
+static void initialiseGlfw();
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos);
+static void scrollCallback(GLFWwindow* window, double x_offset, double y_offset);
 
 #endif
