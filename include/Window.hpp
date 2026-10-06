@@ -22,9 +22,10 @@ class Window
 
     [[nodiscard]] bool wasKeyPressed(int key) const;
     [[nodiscard]] bool shouldClose() const;
-
-    void processInput(float delta_time);
     void swapBuffers() const;
+    void processCameraMovement(float delta_time);
+
+    bool fps_mode {false}; // TODO: move this to private
 
   private:
     void createWindow();
@@ -38,6 +39,7 @@ class Window
 
 static void initialiseGlfw();
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos);
 static void scrollCallback(GLFWwindow* window, double x_offset, double y_offset);
 

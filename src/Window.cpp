@@ -10,6 +10,10 @@ Window::Window()
 {
     initialiseGlfw();
     createWindow();
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
 }
 
 Window::~Window() { glfwDestroyWindow(window); }
@@ -46,24 +50,15 @@ void Window::createWindow()
 
     glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, this);
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-    glfwSetCursorPosCallback(window, mouseCallback);
-    glfwSetScrollCallback(window, scrollCallback);
 }
 
-void Window::processInput(float delta_time)
+void Window::swapBuffers() const { glfwSwapBuffers(window); }
+
+void Window::processCameraMovement(float delta_time)
 {
-    if (!wasKeyPressed(GLFW_KEY_CAPS_LOCK) and camera.first_mouse)
+    if (!fps_mode)
     {
-        Gui::enableMouse();
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        glfwSetCursorPos(window, 0.0, 0.0);
-    }
-    else if (!camera.first_mouse)
-    {
-        camera.first_mouse = true;
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        Gui::disableMouse();
+        return;
     }
 
     if (wasKeyPressed(GLFW_KEY_W))
@@ -85,14 +80,7 @@ void Window::processInput(float delta_time)
     {
         camera.handleKeyboard(Camera::rightward, delta_time);
     }
-
-    if (wasKeyPressed(GLFW_KEY_ESCAPE))
-    {
-        glfwSetWindowShouldClose(window, static_cast<int>(true));
-    }
 }
-
-void Window::swapBuffers() const { glfwSwapBuffers(window); }
 
 static void initialiseGlfw()
 {
@@ -113,10 +101,38 @@ static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+    {
+        if (self->fps_mode)
+        {
+            Gui::enableMouse();
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPos(window, 0.0, 0.0); // ensure no invisible cursor
+            self->fps_mode = false;
+        }
+        else
+        {
+            Gui::disableMouse();
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            self->getCamera().resetMouse();
+            self->fps_mode = true;
+        }
+    }
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, static_cast<int>(true));
+    }
+}
+
 static void mouseCallback(GLFWwindow* window, double x_pos, double y_pos)
 {
     auto* self = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    if (!self->wasKeyPressed(GLFW_KEY_CAPS_LOCK))
+    if (!self->fps_mode)
     {
         return;
     }

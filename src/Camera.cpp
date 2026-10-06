@@ -1,6 +1,8 @@
 #include "Camera.hpp"
 #include <algorithm>
 
+void Camera::resetMouse() { first_mouse = true; }
+
 float Camera::getZoom() const { return zoom; }
 
 glm::mat4 Camera::getViewMatrix() const

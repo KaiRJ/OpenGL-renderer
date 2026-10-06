@@ -51,7 +51,7 @@ int main()
             last_frame = current_frame;
 
             Gui::newFrame();
-            window.processInput(delta_time);
+            window.processCameraMovement(delta_time);
             Renderer::clear(0.2F, 0.3F, 0.3F, 1.0F);
 
             glm::mat4 view {window.getViewMatrix()};

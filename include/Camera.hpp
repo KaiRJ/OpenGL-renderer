@@ -17,6 +17,7 @@ class Camera
     Camera() = default;
     ~Camera() = default;
 
+    void resetMouse();
     [[nodiscard]] float getZoom() const;
     [[nodiscard]] glm::mat4 getViewMatrix() const;
 
@@ -24,13 +25,12 @@ class Camera
     void handleScrollCallback(float x_offset, float y_offset);
     void handleMouseCallback(float x_pos, float y_pos);
 
-    bool first_mouse {true};
-
   private:
     void processMouseMovement(float x_offset, float y_offset);
     void processScrollMovement(float y_offset);
     void updateCameraVectors();
 
+    bool first_mouse {true};
     float move_speed {5.0};
     float look_speed {0.1};
 
