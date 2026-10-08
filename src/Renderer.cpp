@@ -1,5 +1,8 @@
 #include "Renderer.hpp"
 #include "Debug.hpp"
+#include "IndexBuffer.hpp"
+#include "Shader.hpp"
+#include "VertexArray.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -12,14 +15,6 @@ namespace Renderer
         loadOpenglPointers();
         Debug::initialiseDebugOutput();
         glEnable(GL_DEPTH_TEST);
-    }
-
-    void loadOpenglPointers()
-    {
-        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        {
-            throw std::runtime_error("Failed to initialize GLAD");
-        }
     }
 
     void clear(float red, float green, float blue, float alpha)
@@ -40,8 +35,16 @@ namespace Renderer
     {
         vertex_array.Bind();
         shader.Bind();
-        index_buffer.Bind();
-        glDrawElements(GL_TRIANGLES, index_buffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+        index_buffer.bind();
+        glDrawElements(GL_TRIANGLES, index_buffer.getCount(), GL_UNSIGNED_INT, nullptr);
     }
 
 } // namespace Renderer
+
+void loadOpenglPointers()
+{
+    if (!static_cast<bool>(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)))
+    {
+        throw std::runtime_error("Failed to initialize GLAD");
+    }
+}

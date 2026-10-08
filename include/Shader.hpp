@@ -26,9 +26,9 @@ class Shader
   private:
     unsigned int m_shaderID {};
 
-    std::string m_vertexPath {};
-    std::string m_fragmentPath {};
-    std::unordered_map<std::string, int> m_uniformLocationCache {};
+    std::string m_vertexPath;
+    std::string m_fragmentPath;
+    std::unordered_map<std::string, int> m_uniformLocationCache;
 
     int GetUniformLocation(const std::string& name);
 };

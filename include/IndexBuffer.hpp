@@ -13,21 +13,21 @@ class IndexBuffer
 
     ~IndexBuffer();
 
-    void Bind() const;
-    void Unbind() const;
+    void bind() const;
+    static void unbind();
 
-    [[nodiscard]] unsigned int GetCount() const;
+    [[nodiscard]] int getCount() const;
 
   private:
-    unsigned int m_bufferID;
-    unsigned int m_count;
+    unsigned int buffer_id;
+    int count;
 };
 
 template <std::size_t N>
-IndexBuffer::IndexBuffer(const std::array<unsigned int, N>& indices) : m_count(N)
+IndexBuffer::IndexBuffer(const std::array<unsigned int, N>& indices) : count {N}
 {
-    glGenBuffers(1, &m_bufferID);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
+    glGenBuffers(1, &buffer_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices.data(),
                  GL_STATIC_DRAW);
 }

@@ -33,7 +33,7 @@ target_include_directories(imgui PUBLIC
 )
 
 # Create executable
-file(GLOB SOURCES main.cpp src/*)
+file(GLOB SOURCES main.cpp src/* tests/src/*)
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
@@ -43,6 +43,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   include
+  tests/include
   Libraries/glm/
   Libraries/stb/
   Libraries/imgui/

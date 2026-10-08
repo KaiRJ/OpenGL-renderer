@@ -1,9 +1,9 @@
 #include "IndexBuffer.hpp"
 
-IndexBuffer::~IndexBuffer() { glDeleteBuffers(1, &m_bufferID); }
+IndexBuffer::~IndexBuffer() { glDeleteBuffers(1, &buffer_id); }
 
-void IndexBuffer::Bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID); }
+void IndexBuffer::bind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer_id); }
 
-void IndexBuffer::Unbind() const { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
+void IndexBuffer::unbind() { glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
 
-unsigned int IndexBuffer::GetCount() const { return m_count; }
+int IndexBuffer::getCount() const { return count; }

@@ -1,7 +1,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 namespace Debug
