@@ -9,9 +9,9 @@ namespace Test
         Test() = default;
         virtual ~Test() = default;
 
-        virtual void onUpdate(float delta_time) = 0;
-        virtual void onRender() = 0;
-        virtual void onImGuiRender() = 0;
+        virtual void onUpdate(float delta_time) {};
+        virtual void onRender() {};
+        virtual void onImGuiRender() {};
     };
 } // namespace Test
 

@@ -1,16 +1,16 @@
-#ifndef TEST_CLEAR_COLOUR_HPP
-#define TEST_CLEAR_COLOUR_HPP
+#ifndef CLEAR_COLOUR_HPP
+#define CLEAR_COLOUR_HPP
 
 #include "Test.hpp"
 #include <array>
 
 namespace Test
 {
-    class TestClearColour : public Test
+    class ClearColour : public Test
     {
       public:
-        TestClearColour();
-        ~TestClearColour() override = default;
+        ClearColour();
+        ~ClearColour() override = default;
 
         void onUpdate(float delta_time) override {};
         void onRender() override;

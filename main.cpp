@@ -1,8 +1,7 @@
 #include "Gui.hpp"
+#include "Menu.hpp"
 #include "Renderer.hpp"
-#include "TestClearColour.hpp"
 #include "Window.hpp"
-
 #include <cassert>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -12,7 +11,7 @@ int main()
     Gui::initialise(window.getWindow());
     Renderer::initialise();
 
-    Test::TestClearColour test;
+    Test::Menu test_menu {};
 
     {                           // ensure objects are destroyed before glfwTerminate()
         float delta_time {0.0}; // time between current frame and last frame
@@ -24,12 +23,12 @@ int main()
             float current_frame {static_cast<float>(glfwGetTime())};
             delta_time = current_frame - last_frame;
             last_frame = current_frame;
-            test.onUpdate(delta_time);
+            test_menu.onUpdate(delta_time);
 
-            test.onRender();
+            test_menu.onRender();
 
             Gui::newFrame();
-            test.onImGuiRender();
+            test_menu.onImGuiRender();
             Gui::render();
 
             window.swapBuffers();
