@@ -12,7 +12,6 @@ namespace Test
         ClearColour();
         ~ClearColour() override = default;
 
-        void onUpdate(float delta_time) override {};
         void onRender() override;
         void onImGuiRender() override;
 

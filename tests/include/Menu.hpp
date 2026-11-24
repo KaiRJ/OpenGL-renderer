@@ -6,7 +6,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace Test
@@ -22,18 +21,27 @@ namespace Test
         void onRender() override;
         void onImGuiRender() override;
 
+        void setTest(const std::string& test_id);
+
       private:
         std::unique_ptr<Test> current_test;
-        std::vector<std::pair<std::string, std::function<std::unique_ptr<Test>()>>> tests;
+
+        struct RegisteredTest
+        {
+            std::string id;
+            std::string name;
+            std::function<std::unique_ptr<Test>()> create;
+        };
+        std::vector<RegisteredTest> tests;
 
         void registerTests();
         void addTestButtons();
+        void listTests() const;
 
         template <typename T>
-        void registerTest(const std::string& name)
+        void registerTest(const std::string& test_id, const std::string& test_name)
         {
-            std::cout << "Registering test: " << name << "\n";
-            tests.push_back(std::make_pair(name, []() { return std::make_unique<T>(); }));
+            tests.push_back({test_id, test_name, []() { return std::make_unique<T>(); }});
         }
     };
 } // namespace Test

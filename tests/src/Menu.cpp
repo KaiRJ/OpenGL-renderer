@@ -11,7 +11,7 @@ namespace Test
 
     void Menu::onUpdate(float delta_time)
     {
-        if (current_test != nullptr)
+        if (current_test)
         {
             current_test->onUpdate(delta_time);
         }
@@ -19,7 +19,7 @@ namespace Test
 
     void Menu::onRender()
     {
-        if (current_test != nullptr)
+        if (current_test)
         {
             current_test->onRender();
         }
@@ -27,7 +27,7 @@ namespace Test
 
     void Menu::onImGuiRender()
     {
-        if (current_test != nullptr)
+        if (current_test)
         {
             if (ImGui::Button("<-"))
             {
@@ -44,21 +44,44 @@ namespace Test
         }
     }
 
+    void Menu::setTest(const std::string& test_id)
+    {
+        for (const auto& test : tests)
+        {
+            if (test_id == test.id)
+            {
+                current_test = test.create();
+                return;
+            }
+        }
+
+        std::cout << "Invalid test ID!" << "\n";
+        listTests();
+    }
+
     void Menu::registerTests()
     {
-        registerTest<DemoWindow>("ImGui Demo Window");
-        registerTest<ClearColour>("Clear Colour");
+        registerTest<DemoWindow>("imgui", "ImGui Demo Window");
+        registerTest<ClearColour>("clear", "Clear Colour");
     }
 
     void Menu::addTestButtons()
     {
-        for (auto& test : tests)
+        for (const auto& test : tests)
         {
-            if (ImGui::Button(test.first.c_str()))
+            if (ImGui::Button(test.name.c_str()))
             {
-                current_test = test.second();
+                current_test = test.create();
             }
         }
     }
 
+    void Menu::listTests() const
+    {
+        std::cout << "Available tests:\n";
+        for (const auto& test : tests)
+        {
+            std::cout << "  " << test.id << "\t" << test.name << '\n';
+        }
+    }
 } // namespace Test
