@@ -1,9 +1,8 @@
 #ifndef VERTEX_BUFFER_H
 #define VERTEX_BUFFER_H
 
-#include <glad/glad.h>
-
 #include <array>
+#include <glad/glad.h>
 
 class VertexBuffer
 {
@@ -26,7 +25,7 @@ void VertexBuffer::AddData(std::array<T, N> data)
 {
     glGenBuffers(1, &m_bufferID);
     glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(data), data.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(T), data.data(), GL_STATIC_DRAW);
 }
 
 #endif

@@ -3,19 +3,17 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
 #include <string>
 #include <unordered_map>
 
 class Shader
 {
   public:
-    Shader(std::string vertexPath, std::string fragmentPath);
+    Shader(std::string vpath, std::string fpath);
     ~Shader();
 
     void Bind() const;
-    void Unbind() const;
-
+    static void Unbind();
     void Reload();
 
     // Set uniforms
@@ -24,13 +22,17 @@ class Shader
     void SetUniformMatrix4fv(const std::string& name, glm::mat4 value);
 
   private:
-    unsigned int m_shaderID {};
-
-    std::string m_vertexPath;
-    std::string m_fragmentPath;
-    std::unordered_map<std::string, int> m_uniformLocationCache;
+    unsigned int shader_id;
+    std::string vertex_path;
+    std::string fragment_path;
+    std::unordered_map<std::string, int> uniform_location_cache;
 
     int GetUniformLocation(const std::string& name);
 };
+
+std::string parseShader(const std::string& path);
+unsigned int createShader(unsigned int type, const char* source);
+unsigned int createShaderProgram(const std::string& vertex_path,
+                                 const std::string& fragment_path);
 
 #endif

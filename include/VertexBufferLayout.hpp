@@ -14,18 +14,18 @@ struct VertexBufferElement
 class VertexBufferLayout
 {
   public:
-    VertexBufferLayout();
-    ~VertexBufferLayout();
+    VertexBufferLayout() = default;
+    ~VertexBufferLayout() = default;
 
-    const std::vector<VertexBufferElement>& getElements() const;
-    const unsigned int& getStride() const;
+    [[nodiscard]] const std::vector<VertexBufferElement>& getElements() const;
+    [[nodiscard]] const unsigned int& getStride() const;
 
     template <typename T>
     void Push(unsigned int count);
 
   private:
-    std::vector<VertexBufferElement> m_elements {};
-    unsigned int m_stride {};
+    std::vector<VertexBufferElement> elements;
+    unsigned int stride {0};
 };
 
 #endif

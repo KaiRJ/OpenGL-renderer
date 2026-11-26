@@ -1,7 +1,9 @@
 #include "Menu.hpp"
 #include "ClearColour.hpp"
 #include "DemoWindow.hpp"
+#include "Triangles.hpp"
 #include "imgui.h"
+#include <iostream>
 
 namespace Test
 {
@@ -63,6 +65,7 @@ namespace Test
     {
         registerTest<DemoWindow>("imgui", "ImGui Demo Window");
         registerTest<ClearColour>("clear", "Clear Colour");
+        registerTest<Triangles>("triangles", "Triangles");
     }
 
     void Menu::addTestButtons()
